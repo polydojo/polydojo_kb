@@ -9,7 +9,7 @@ var __bootstrap = require("bootstrap");
 var misc = require("./misc.js");
 var {uk, app} = require("./dash-00-def.js");
 
-app.dojoLister = require("./dash-03-dojoLister.js");
+app.pageLister = require("./dash-03-pageLister.js");
 app.scratchpadr = require("./dash-04-scratchpadr.js");
 app.userLister = require("./dash-06-userLister.js");
 

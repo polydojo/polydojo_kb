@@ -57,7 +57,7 @@ X.S3 = {
     "ENDPOINT": envi.read("S3_ENDPOINT"),
     "ACCESS_KEY": envi.read("S3_ACCESS_KEY_ID"),
     "ACCESS_SECRET": envi.read("S3_SECRET_ACCESS_KEY"),
-    "BUCKET_NAME": envi.read("S3_BUCKET_NAME", "polydojo-onprem"),
+    "BUCKET_NAME": envi.read("S3_BUCKET_NAME", "polydojo-kb-onprem"),
     "BUCKET_LOCATION": envi.read("S3_BUCKET_REGION", "us-east-2"),
 };
 
@@ -68,21 +68,21 @@ X.SMTP = {
     "PASSWORD": envi.read("SMTP_PASSWORD"),
     "STARTTLS": (envi.read("SMTP_STARTTLS").lower() == "true"),
     # Quick defaults:
-    "DEFAULT_FROM_NAME": envi.read("SMTP_FROM_NAME", "polydojo onprem"),
-    "DEFAULT_FROM_EMAIL": envi.read("SMTP_FROM_EMAIL", "us-east-2"),
+    "DEFAULT_FROM_NAME": envi.read("SMTP_FROM_NAME", "polydojo-kb-onprem"),
+    "DEFAULT_FROM_EMAIL": envi.read("SMTP_FROM_EMAIL", "polydojo-kb-onprem@example.com"),
 };
 X.MEMFILE_MAX = 30 * 1000 * 1000; # ~ 30 MB
 
 X.USER_EMAIL_INDEX_NAME = "user_email_index";
 
 X.CURRENT_USER_V = 0;
-X.CURRENT_DOJO_V = 0;
-X.CURRENT_RECORD_V = 0;
-X.CURRENT_COMMENT_V = 0;
+X.CURRENT_PAGE_V = 0;
+X.CURRENT_CAT_V = 0;
+X.CURRENT_SUBCAT_V = 0;
 X.CURRENT_FUPLOAD_V = 0;
 
 X.EMAIL_RE = r'^\S+@\S+\.\S+$';
-X.PASSWORD_RE = r'.{8,}';
+X.PASSWORD_RE = r'.{12,}';
 
 
 # Anti-xss/mime-type related:

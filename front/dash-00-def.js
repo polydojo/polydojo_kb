@@ -22,7 +22,7 @@ var app = {
 };
 
 app.o.userMap = uk.observableDocMap("fname");
-app.o.dojoMap = uk.observableDocMap("title");
+app.o.pageMap = uk.observableDocMap("title");
 
 app.o.currentUserId = uk.observable(null);
 app.c.currentUser = uk.computed(

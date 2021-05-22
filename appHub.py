@@ -15,6 +15,6 @@ from appDef import app;
 import staticCon;                                           # Import staticCon first, as it does static, emailing etc. configurations.
 
 import userCon;
-import dojoCon;
+import pageCon;
 
 # xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx

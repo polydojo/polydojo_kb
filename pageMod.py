@@ -18,16 +18,16 @@ import bu;
 # Assertions & prelims:                                    #
 ############################################################
 
-assert K.CURRENT_DOJO_V == 0;
-db = dotsi.fy({"dojoBox": mongo.db.dojoBox});   # Isolate
+assert K.CURRENT_PAGE_V == 0;
+db = dotsi.fy({"pageBox": mongo.db.pageBox});   # Isolate
     
 ############################################################
-# Dojo building and validation:                            #
+# Page building and validation:                            #
 ############################################################
 
-validateDojo = vf.dictOf({
+validatePage = vf.dictOf({
     "_id": utils.isObjectId,
-    "_v": lambda x: x == K.CURRENT_DOJO_V,
+    "_v": lambda x: x == K.CURRENT_PAGE_V,
     #
     # Intro'd in _v0:
     "title": vf.typeIs(str),
@@ -36,11 +36,11 @@ validateDojo = vf.dictOf({
     "createdAt": utils.isInty,
 });
 
-def buildDojo (title, creatorId):
-    assert K.CURRENT_DOJO_V == 0;
+def buildPage (title, creatorId):
+    assert K.CURRENT_PAGE_V == 0;
     return dotsi.fy({
         "_id": utils.objectId(),
-        "_v": K.CURRENT_DOJO_V,
+        "_v": K.CURRENT_PAGE_V,
         #
         # Intro'd in _v0:
         "title": title,
@@ -53,56 +53,56 @@ def buildDojo (title, creatorId):
 # Adapting: <-- TODO
 ############################################################
 
-dojoAdp = dotsi.fy({"adapt": lambda x, y=0: dotsi.fy(x)});
+pageAdp = dotsi.fy({"adapt": lambda x, y=0: dotsi.fy(x)});
 
 ############################################################
 # Getting:
 ############################################################
 
-def getDojo (q, shouldUpdateDb=True):
-    "Query traditionally for a single dojo.";
+def getPage (q, shouldUpdateDb=True):
+    "Query traditionally for a single page.";
     assert type(q) in [str, dict];
-    dojo = db.dojoBox.find_one(q);
-    if dojo is None:
+    page = db.pageBox.find_one(q);
+    if page is None:
         return None;
-    return dojoAdp.adapt(dojo, shouldUpdateDb);
+    return pageAdp.adapt(page, shouldUpdateDb);
 
 
-def getDojoList (q=None, shouldUpdateDb=True):
-    "Query traditionally for multiple dojos.";
+def getPageList (q=None, shouldUpdateDb=True):
+    "Query traditionally for multiple pages.";
     q = q or {};
     assert type(q) is dict;
-    adaptWrapper = lambda dojo: (                                       # A wrapper around `adapt`, aware of `shouldUpdateDb`.
-        dojoAdp.adapt(dojo, shouldUpdateDb)#, # NO COMMA
+    adaptWrapper = lambda page: (                                       # A wrapper around `adapt`, aware of `shouldUpdateDb`.
+        pageAdp.adapt(page, shouldUpdateDb)#, # NO COMMA
     );
-    return utils.map(adaptWrapper, db.dojoBox.find(q));
+    return utils.map(adaptWrapper, db.pageBox.find(q));
 
-def getDojoCount (q=None):
-    return db.dojoBox.count_documents(q or {});
+def getPageCount (q=None):
+    return db.pageBox.count_documents(q or {});
 
 ############################################################
 # Inserting, Updating & Deleting:
 ############################################################
 
-def insertDojo (dojo):
-    "More or less blindly INSERTS dojo to db.";             # Used primarily for inviting dojos.
-    assert validateDojo(dojo);
-    #print("inserting dojo: ", dojo);
-    dbOut = db.dojoBox.insert_one(dojo);
-    assert dbOut.inserted_id == dojo._id;
+def insertPage (page):
+    "More or less blindly INSERTS page to db.";             # Used primarily for inviting pages.
+    assert validatePage(page);
+    #print("inserting page: ", page);
+    dbOut = db.pageBox.insert_one(page);
+    assert dbOut.inserted_id == page._id;
     return dbOut;
 
-def replaceDojo (dojo):
-    "More or less blindly REPLACES dojo in db.";            # Used primarily for updating fname/lname/password etc of logged-in dojos.
-    assert validateDojo(dojo);
-    dbOut = db.dojoBox.replace_one({"_id": dojo._id}, dojo);
+def replacePage (page):
+    "More or less blindly REPLACES page in db.";            # Used primarily for updating fname/lname/password etc of logged-in pages.
+    assert validatePage(page);
+    dbOut = db.pageBox.replace_one({"_id": page._id}, page);
     assert dbOut.matched_count == 1 == dbOut.modified_count;
     return dbOut;
 
-def deleteDojo (dojo):
+def deletePage (page):
     "Deletes an unverified, invited.";
-    assert validateDojo(dojo);
-    dbOut = db.dojoBox.delete_one({"_id": dojo._id});
+    assert validatePage(page);
+    dbOut = db.pageBox.delete_one({"_id": page._id});
     assert dbOut.deleted_count == 1;
     return True;
 
