@@ -50,6 +50,8 @@ X.AUTH_COOKIE_SECRET = "auth-cookie-secret::" + X.SECRET_KEY;
 X.ANTI_CSRF_SECRET = "anti-csrf-secret::" + X.SECRET_KEY;
 U.REMEMBER_ME_DAY_COUNT = 30;                               # Available @ client, visible in (httpOnly) cookie anyway.
 
+U.GH_REPO_URL = "https://github.com/polydojo/polydojo_kb";
+
 
 X.DATABASE_URL = envi.read("DATABASE_URL");
 

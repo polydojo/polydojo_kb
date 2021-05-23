@@ -4,7 +4,8 @@
  */
 
 var K = {
-    "REMEMBER_ME_DAY_COUNT": 30
+    "REMEMBER_ME_DAY_COUNT": 30,
+    "GH_REPO_URL": "https://github.com/polydojo/polydojo_kb"
 };
 
 module.exports = K;

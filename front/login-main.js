@@ -1,8 +1,18 @@
 var $ = require("jquery");
 var _ = require("underscore");
 var misc = require("./misc.js");
+var K = require("./constants.js");
 
-$(function () { misc.spinner.stop(); });
+$(function () {
+    misc.spinner.stop();
+    // TODO-the-following:
+    /*
+    _.each($(".ghRepoUrl"), function (el) {                 // <-- TODO: Set .ghRepoUrl's href not only for login.html, but others too.
+        el.href = K.GH_REPO_URL;
+        el.target = "_blank";
+    });
+    */
+});
 
 $("form.loginr").on("submit", async function (event) {
     event.preventDefault();

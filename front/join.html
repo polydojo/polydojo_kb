@@ -27,7 +27,7 @@
         }
     </style>
     
-    <title>Polydojo | Join</title>
+    <title>Polydojo KB | Join Your Team</title>
 </head>
 <body class="container">
 
@@ -40,9 +40,14 @@
     
     <br>
     <form class="joinr">
-        <img src="/front/img/logo/texty-logo-360.png" width="192">
-        <p>Join your team members.</p>
-        <hr>
+        <div class="form-group">
+            <div class="" style="font-size: 20px;">
+                <img class="verticalMiddle" src="/front/img/logo/logo-192.png" width="20">
+                <span class="verticalMiddle">Polydojo KB</span>
+            </div>
+            <h3 class="mt-2 mb-1">Join Your Team</h3>
+            <hr>
+        </div>
         <div class="form-group">
             <label>First Name</label>
             <input type="text" name="fname" class="form-control" placeholder="" readonly required>
@@ -70,6 +75,11 @@
         <div class="form-group">
             <button class="btn btn-primary px-4">Submit</button>
         </div>
+        <footer class="small gray mt-4">
+            <hr>
+            Powered by <!-- TODO: Set .ghRepoUrl's href via js. -->
+            <a class="unsetColor underline ghRepoUrl" href="https://github.com/polydojo/polydojo_kb" target="_blank">Polydojo KB</a>.
+        </footer>
     </form>
     <script src="/front/.join-bundle.js"></script>
 </body>
