@@ -33,8 +33,8 @@
                     Menu <i class="fa fa-fw fa-chevron-circle-down"></i>
                 </button>&nbsp;
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="primaryDropdownMenuButton">
-                    <a class="dropdown-item" href="?id=pageLister">
-                        <i class="fa fa-fw fa-file-alt"></i>&nbsp; Pages
+                    <a class="dropdown-item" href="?id=articleLister">
+                        <i class="fa fa-fw fa-file-alt"></i>&nbsp; Articles
                     </a>
                     <a class="dropdown-item" href="?id=userLister">
                         <i class="fa fa-fw fa-users"></i>&nbsp; Users
@@ -45,7 +45,7 @@
                     </a>
                 </div>
             </div>
-            <a class="unsetColor noUnderline" href="?id=pageLister" style="font-size: 24px;">
+            <a class="unsetColor noUnderline" href="?id=articleLister" style="font-size: 24px;">
                 <img class="verticalMiddle" src="/front/img/logo/logo-192.png" width="24">
                 <span class="verticalMiddle">Polydojo KB</span>
             </a>
@@ -53,43 +53,50 @@
         </header>
         
         
-        <!-- ROUTE 'pageLister': -->
-        <div class="{{ m.router.ifRoute('pageLister') }}" id="pageLister">
-            <% if (m.router.c.activeId === "pageLister") { %>
+        <!-- ROUTE 'articleLister': -->
+        <div class="{{ m.router.ifRoute('articleLister') }}" id="articleLister">
+            <% if (m.router.c.activeId === "articleLister") { %>
                 <header>
                     <div class="floatRight">
-                        <button class="btn btn-light" data-on="click" data-call="/pageLister/onClick_createPage">
-                            <i class="fa fa-fw fa-plus"></i> Create Page
+                        <button class="btn btn-light" data-on="click" data-call="/articleLister/onClick_createArticle">
+                            <i class="fa fa-fw fa-plus"></i> Create Article
                         </button>
                     </div>
-                    <h3>Page Lister</h3>
+                    <h3>Article Lister</h3>
                     <br>
                 </header>
+                <% if (m.articleLister.c.articleList.length === 0) { %>
+                    <p class="centerText large">
+                        <br><br>
+                        No articles yet. Get started by clicking <i>"Create Article"</i> above.
+                        <br><br>
+                    </p>
+                <% } %>
                 <ul>
-                    <% _.each(m.pageLister.c.pageList, function (page) { %>
+                    <% _.each(m.articleLister.c.articleList, function (article) { %>
                         <li>
                             <h4>
-                                <a href="?id=scratchpadr&amp;pageId={{page._id}}">{{ page.title }}</a>
+                                <a href="?id=scratchpadr&amp;articleId={{article._id}}">{{ article.title }}</a>
                             </h4>
                         </li>
                     <% }); %>
                 </ul>
             <% } %><!-- end route guard -->
-        </div><!-- end route 'pageLister' -->
+        </div><!-- end route 'articleLister' -->
         
 
         <!-- ROUTE 'scratchpadr': -->
         <div class="{{ m.router.ifRoute('scratchpadr') }}" id="scratchpadr">
-            <% if (m.scratchpadr.c.page && m.router.c.activeId === "scratchpadr") { %>
+            <% if (m.scratchpadr.c.article && m.router.c.activeId === "scratchpadr") { %>
                 <header>
-                    <h3>{{m.scratchpadr.c.page.title}}</h3>
+                    <h3>{{m.scratchpadr.c.article.title}}</h3>
                     <!--<br>-->
                 </header>
                 <form data-on="submit" data-call="/scratchpadr/onSubmit_saveScratch">
                     <div class="form-group">
                         <label><code>Scratchpad</code></label>
                         <textarea name="scratchText" class="form-control monospace" rows="15"
-                            >{{m.scratchpadr.c.page.scratchpad}}</textarea>
+                            >{{m.scratchpadr.c.article.scratchpad}}</textarea>
                         <!-- one-way mToV binding-->
                     </div>
                     <div class="form-group">

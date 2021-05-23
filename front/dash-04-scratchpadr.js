@@ -9,23 +9,23 @@ var {uk, app} = require("./dash-00-def.js");
 
 var sp = {"id": "scratchpadr", "o": {}, "c": {}};           // Scratchpad-r
 
-sp.o.pageId = uk.observable(null);
+sp.o.articleId = uk.observable(null);
 
-sp.c.page = uk.computed(
+sp.c.article = uk.computed(
     function () {
-        var pageId = sp.o.pageId.get();
-        if (! pageId) { return null; }  // short ckt.
-        var page = app.o.pageMap.get()[pageId];
-        if (! page) { return null; }    // short ckt.
-        // ==> page found.
-        return page
+        var articleId = sp.o.articleId.get();
+        if (! articleId) { return null; }  // short ckt.
+        var article = app.o.articleMap.get()[articleId];
+        if (! article) { return null; }    // short ckt.
+        // ==> article found.
+        return article
     },
-    [sp.o.pageId, app.o.pageMap]
+    [sp.o.articleId, app.o.articleMap]
 );
 
 sp.open = function (info) {
-    sp.o.pageId.set(info.pageId);
-    if (! sp.c.page.get()) {
+    sp.o.articleId.set(info.articleId);
+    if (! sp.c.article.get()) {
         app.router.openDefault();
     }
 };
@@ -33,18 +33,18 @@ sp.open = function (info) {
 sp.onSubmit_saveScratch = async function (event) {
     const $scratchText = $(event.currentTarget.scratchText);
     const dataToSend = {
-        "pageId": sp.o.pageId.get(),
-        "title": sp.c.page.get().title,
+        "articleId": sp.o.articleId.get(),
+        "title": sp.c.article.get().title,
         "scratchpad": $scratchText.val(),
     };
     misc.spinner.start("Saving ...");
-    const resp = await misc.postJson("/pageCon/updateScratchpad", dataToSend);
-    app.o.pageMap.updateOne(resp.page);
+    const resp = await misc.postJson("/articleCon/updateScratchpad", dataToSend);
+    app.o.articleMap.updateOne(resp.article);
     misc.spinner.stop();
 };
 
 sp.close = function () {
-    sp.o.pageId.set(null);
+    sp.o.articleId.set(null);
 };
 
 module.exports = sp;
