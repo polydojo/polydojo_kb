@@ -8,8 +8,10 @@
     
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/node_modules/@fortawesome/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="/node_modules/summernote/dist/summernote-bs4.css"><!-- pre-minified -->
     <link rel="stylesheet" href="/front/helpers.css">
     <link rel="stylesheet" href="/front/general.css">
+    <link rel="stylesheet" href="/front/dash.css">
     
     <title>Polydojo KB</title>
 </head>
@@ -62,7 +64,7 @@
                             <i class="fa fa-fw fa-plus"></i> Create Article
                         </button>
                     </div>
-                    <h3>Article Lister</h3>
+                    <h3>Articles</h3>
                     <br>
                 </header>
                 <% if (m.articleLister.c.articleList.length === 0) { %>
@@ -89,8 +91,8 @@
         <div class="{{ m.router.ifRoute('articleEditor') }}" id="articleEditor">
             <% if (m.articleEditor.c.article && m.router.c.activeId === "articleEditor") { %>
                 <header>
-                    <h3>{{m.articleEditor.c.article.title}}</h3>
-                    <!--<br>-->
+                    <h4>Article Editor</h4>
+                    <p></p>
                 </header>
                 <form data-on="submit" data-call="/articleEditor/onSubmit_saveArticle">
                     <div class="form-group">
@@ -99,12 +101,13 @@
                             value="{{m.articleEditor.c.article.title}}"
                         >
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" data-should-avoid-update="true">
                         <label>Body</label>
-                        <textarea name="bodyArea" class="form-control" rows="15"
+                        <textarea id="summernote_bodyArea" name="bodyArea" class="form-control" rows="15"
                             >{{m.articleEditor.c.article.body}}</textarea>
                         <!-- one-way mToV binding-->
                     </div>
+                    <!--TODO:
                     <div class="row">
                         <div class="col-md">
                             <div class="form-group">
@@ -119,6 +122,7 @@
                             </div>
                         </div>
                     </div>
+                    -->
                     <div class="form-group">
                         <button class="btn btn-primary">
                             <i class="fa fa-fw fa-save"></i> Save
@@ -192,7 +196,7 @@
                             </div>
                             &nbsp;
                             <span>
-                                {{ user.fname }} {{user.lname}} <small class="">{{user.email}}</small>
+                                {{user.fname}} {{user.lname}} <small class="">{{user.email}}</small>
                             </span>
                         </li>
                     <% }); %>

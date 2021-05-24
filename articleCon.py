@@ -14,6 +14,7 @@ from constants import K;
 import articleMod;
 import utils;
 import auth;
+import bleachUp;
 
 
 @app.post("/articleCon/createArticle")
@@ -39,14 +40,16 @@ def post_articleCon_updateArticle ():
         articleId, title, body,
     """);
     sesh = auth.getSesh();
-    article = articleMod.getArticle(jdata.articleId);
-    article.update({
+    oldArticle = articleMod.getArticle(jdata.articleId);    # old => before update
+    newArticle = utils.deepCopy(oldArticle);                # new => after update
+    newArticle.update({
         "title": jdata.title,
-        "body": jdata.body,
+        "body": bleachUp.bleachHtml(jdata.body),
     });
-    assert articleMod.validateArticle(article);
-    articleMod.replaceArticle(article);
-    return {"article": article};
+    assert articleMod.validateArticle(newArticle);
+    if oldArticle != newArticle:
+        articleMod.replaceArticle(newArticle);
+    return {"article": newArticle};
 
 @app.post("/articleCon/deleteArticle")
 def post_articleCon_updateArticle ():

@@ -2,6 +2,9 @@
 var _ = require("underscore");
 var $ = require("jquery");
 var Swal = require('sweetalert2')["default"];
+var __summernote = require("summernote/dist/summernote-bs4.min.js");
+
+window.$ = $;
 
 // loc:
 var misc = require("./misc.js");
@@ -28,14 +31,18 @@ ae.open = function (info) {
     if (! ae.c.article.get()) {
         app.router.openDefault();
     }
+    $("#summernote_bodyArea").summernote({
+        "minHeight": 300,
+        "focus": false,     // No auto-focus
+    });
 };
 
 ae.onSubmit_saveArticle = async function (event) {
-    const $bodyArea = $(event.currentTarget.bodyArea);
+    const form = event.currentTarget;
     const dataToSend = {
         "articleId": ae.o.articleId.get(),
-        "title": ae.c.article.get().title,
-        "body": $bodyArea.val(),
+        "title": form.title.value,
+        "body": form.bodyArea.value,
     };
     misc.spinner.start("Saving ...");
     const resp = await misc.postJson("/articleCon/updateArticle", dataToSend);
@@ -45,6 +52,7 @@ ae.onSubmit_saveArticle = async function (event) {
 
 ae.close = function () {
     ae.o.articleId.set(null);
+    $("#summernote_bodyArea").summernote("destroy");
 };
 
 module.exports = ae;
