@@ -10,7 +10,7 @@ var misc = require("./misc.js");
 var {uk, app} = require("./dash-00-def.js");
 
 app.articleLister = require("./dash-03-articleLister.js");
-app.scratchpadr = require("./dash-04-scratchpadr.js");
+app.articleEditor = require("./dash-04-articleEditor.js");
 app.userLister = require("./dash-06-userLister.js");
 
 app.detectLogin = async function () {

@@ -21,8 +21,8 @@ def post_articleCon_createArticle ():
     jdata = bu.get_jdata(ensure="title");
     sesh = auth.getSesh();
     article = articleMod.buildArticle(
-        title = jdata.title,
         creatorId = sesh.user._id,
+        title = jdata.title,
     );
     assert articleMod.validateArticle(article);
     articleMod.insertArticle(article);
@@ -33,16 +33,16 @@ def post_articleCon_fetchArticleList ():
     sesh = auth.getSesh();
     return {"articleList": articleMod.getArticleList()};
 
-@app.post("/articleCon/updateScratchpad")
+@app.post("/articleCon/updateArticle")
 def post_articleCon_updateArticle ():
     jdata = bu.get_jdata(ensure="""
-        articleId, title, scratchpad,
+        articleId, title, body,
     """);
     sesh = auth.getSesh();
     article = articleMod.getArticle(jdata.articleId);
     article.update({
         "title": jdata.title,
-        "scratchpad": jdata.scratchpad,
+        "body": jdata.body,
     });
     assert articleMod.validateArticle(article);
     articleMod.replaceArticle(article);

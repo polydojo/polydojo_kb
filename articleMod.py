@@ -13,12 +13,13 @@ from constants import K;
 import mongo;
 import utils;
 import bu;
+import stdAdpBuilder;
 
 ############################################################
 # Assertions & prelims:                                    #
 ############################################################
 
-assert K.CURRENT_ARTICLE_V == 0;
+assert K.CURRENT_ARTICLE_V == 1;
 db = dotsi.fy({"articleBox": mongo.db.articleBox});   # Isolate
     
 ############################################################
@@ -30,30 +31,78 @@ validateArticle = vf.dictOf({
     "_v": lambda x: x == K.CURRENT_ARTICLE_V,
     #
     # Intro'd in _v0:
+    #
     "title": vf.typeIs(str),
-    "scratchpad": vf.typeIs(str),
+    #"scratchpad": vf.typeIs(str),  -- Renamed in _v1 to 'body'
     "creatorId": utils.isObjectId,
     "createdAt": utils.isInty,
+    #
+    # Intro'd in _v1:
+    #
+    "body": vf.typeIs(str),
+    "categoryId": utils.isBlankOrObjectId,
+    "sectionId": utils.isBlankOrObjectId,
 });
 
-def buildArticle (title, creatorId):
-    assert K.CURRENT_ARTICLE_V == 0;
+def buildArticle (creatorId, title=""):
+    assert K.CURRENT_ARTICLE_V == 1;
     return dotsi.fy({
         "_id": utils.objectId(),
         "_v": K.CURRENT_ARTICLE_V,
         #
         # Intro'd in _v0:
+        #
         "title": title,
-        "scratchpad": "",
+        #"scratchpad": "",           -- Renamed in _v1 to 'body'
         "creatorId": creatorId,
         "createdAt": utils.now(),
+        #
+        # Intro'd in _v1:
+        #
+        "body": "",
+        "categoryId": "",   # blank => Untitled, topmost category.
+        "sectionId": "",    # blank => Untitled, topmost section.
     });
 
 ############################################################
-# Adapting: <-- TODO
+# Adapting:
 ############################################################
 
-articleAdp = dotsi.fy({"adapt": lambda x, y=0: dotsi.fy(x)});
+articleAdp = stdAdpBuilder.buildStdAdp(
+    str_fooBox = "articleBox",
+    str_CURRENT_FOO_V = "CURRENT_ARTICLE_V",
+    int_CURRENT_FOO_V = K.CURRENT_ARTICLE_V,
+    func_validateFoo = validateArticle,
+);
+
+@articleAdp.addStepAdapter
+def stepAdapterCore_from_0_to_1 (articleY):                    # Note: This _CANNOT_ be a lambda as `addStepAdapter` relies on .__name__
+    # article._v: 0 --> 1
+    # Renamed:
+    #   ~ scratchpad --> body
+    # Added:
+    #   + categoryId
+    #   + sectionId
+    articleY.update({
+        "body": articleY.pop("scratchpad"),
+        "categoryId": "",
+        "sectionId": "",
+    });
+
+assert articleAdp.getStepCount() == K.CURRENT_ARTICLE_V;
+
+# Adaptation Checklist:
+# Assertions will help you.
+# You'll need to look at:
+#   + constants.py
+#   + articleMod.py
+#       + top (K) assertion
+#       + define stepAdapterCore_from_X_to_Y
+#       + modify builder/s as needed
+#       + modify validator/s as needed
+#       + modify snip/s if any, as needed
+#   + articleCon.py and others:
+#       + modify funcs that call articleMod's funcs.
 
 ############################################################
 # Getting:

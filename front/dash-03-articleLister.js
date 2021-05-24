@@ -7,25 +7,25 @@ var misc = require("./misc.js");
 var {uk, app} = require("./dash-00-def.js");
 
 // RouteApp:
-var dl = {"id": "articleLister", "o": {}, "c": {}};            // Article Lister
+var al = {"id": "articleLister", "o": {}, "c": {}};
 
 
 // Observables & Computeds:
-dl.c.articleList = app.o.articleMap.list, // Alias, snap-friendly.
+al.c.articleList = app.o.articleMap.list, // Alias, snap-friendly.
 
 // Open:
-dl.open = function () {
-    dl.fetchArticleListIfReqd();
+al.open = function () {
+    al.fetchArticleListIfReqd();
 };
-dl.fetchArticleListIfReqd = async function () {
+al.fetchArticleListIfReqd = async function () {
     if (app.o.articleMap.isFetched.get()) {
         // ==> Already fetched.
         return app.o.articleMap.list();
     }
     // ==> Not yet fetched.
-    return await dl.fetchArticleList();
+    return await al.fetchArticleList();
 };
-dl.fetchArticleList = async function () {
+al.fetchArticleList = async function () {
     misc.spinner.start("Fetching Articles ...");
     let resp = await misc.postJson("/articleCon/fetchArticleList", {});
     //misc.alertJson(resp);
@@ -36,7 +36,7 @@ dl.fetchArticleList = async function () {
 };
 
 // Creating:
-dl.onClick_createArticle = async function () {
+al.onClick_createArticle = async function () {
     var swalOut = await Swal.fire({
         "title": "Create Article",
         "input": "text",
@@ -53,9 +53,9 @@ dl.onClick_createArticle = async function () {
     app.o.articleMap.updateOne(article);
     misc.spinner.stop();
     app.router.setInfo({
-        "id": "scratchpadr",
+        "id": "articleEditor",
         "articleId": article._id,
     });
 };
 
-module.exports = dl;
+module.exports = al;

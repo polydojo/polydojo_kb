@@ -76,7 +76,7 @@
                     <% _.each(m.articleLister.c.articleList, function (article) { %>
                         <li>
                             <h4>
-                                <a href="?id=scratchpadr&amp;articleId={{article._id}}">{{ article.title }}</a>
+                                <a href="?id=articleEditor&amp;articleId={{article._id}}">{{ article.title }}</a>
                             </h4>
                         </li>
                     <% }); %>
@@ -85,19 +85,39 @@
         </div><!-- end route 'articleLister' -->
         
 
-        <!-- ROUTE 'scratchpadr': -->
-        <div class="{{ m.router.ifRoute('scratchpadr') }}" id="scratchpadr">
-            <% if (m.scratchpadr.c.article && m.router.c.activeId === "scratchpadr") { %>
+        <!-- ROUTE 'articleEditor': -->
+        <div class="{{ m.router.ifRoute('articleEditor') }}" id="articleEditor">
+            <% if (m.articleEditor.c.article && m.router.c.activeId === "articleEditor") { %>
                 <header>
-                    <h3>{{m.scratchpadr.c.article.title}}</h3>
+                    <h3>{{m.articleEditor.c.article.title}}</h3>
                     <!--<br>-->
                 </header>
-                <form data-on="submit" data-call="/scratchpadr/onSubmit_saveScratch">
+                <form data-on="submit" data-call="/articleEditor/onSubmit_saveArticle">
                     <div class="form-group">
-                        <label><code>Scratchpad</code></label>
-                        <textarea name="scratchText" class="form-control monospace" rows="15"
-                            >{{m.scratchpadr.c.article.scratchpad}}</textarea>
+                        <label>Title</label>
+                        <input type="text" name="title" class="form-control form-control-lg"
+                            value="{{m.articleEditor.c.article.title}}"
+                        >
+                    </div>
+                    <div class="form-group">
+                        <label>Body</label>
+                        <textarea name="bodyArea" class="form-control" rows="15"
+                            >{{m.articleEditor.c.article.body}}</textarea>
                         <!-- one-way mToV binding-->
+                    </div>
+                    <div class="row">
+                        <div class="col-md">
+                            <div class="form-group">
+                                <label>Category</label>
+                                <input type="text" class="form-control" disabled>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <div class="form-group">
+                                <label>Section</label>
+                                <input type="text" class="form-control" disabled>
+                            </div>
+                        </div>
                     </div>
                     <div class="form-group">
                         <button class="btn btn-primary">
@@ -106,7 +126,7 @@
                     </div>
                 </form>
             <% } %><!-- end route guard -->
-        </div><!-- end route 'scratchpadr' -->
+        </div><!-- end route 'articleEditor' -->
         
 
         <!-- ROUTE 'userLister': -->
