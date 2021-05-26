@@ -18,32 +18,43 @@
 <body class="container">
 
     <script type="text/html" id="optionsForCategoryPicker" data-as="sm"> <!-- /> -->
+        <!-- sm: {selectedId} -->
         <% _.each(m.articleLister.c.combo.catDropOptList, function (catDropOpt) { %>
-            <option value="{{catDropOpt.value}}">{{catDropOpt.text}}</option>
+            <option value="{{catDropOpt.value}}" {{uk.if(sm.selectedId === catDropOpt.value, 'selected')}}>
+                {{catDropOpt.text}}
+            </option>
         <% }); %>
     </script>
 
-    <script type="text/html" id="modalbox_createCategory" data-as="sm"> <!-- /> -->
-        <form data-on="submit" data-call="/articleLister/onSubmit_createCategory">
+    <script type="text/html" id="modalbox_createOrEditCategory" data-as="sm"> <!-- /> -->
+        <!-- sm: {mode: create/edit, categoryId, }-->
+        <%
+            let category = m.o.categoryMap[sm.categoryId || ""];
+        %>
+        <form data-on="submit" data-call="/articleLister/onSubmit_createOrEditCategory">
             <div class="form-group">
-                <h3>New Category</h3>
+                <h3>{{uk.if(sm.mode === "create", "Create", "Edit")}} Category</h3>
                 <hr>
+            </div>
+            <div class="d-none">
+                <!-- Hidden: 'mode' and 'categoryId' inputs. -->
+                <input type="hidden" name="mode" value="{{sm.mode}}" required>
+                <input type="hidden" name="categoryId" value="{{category._id}}" {{uk.if(sm.mode !== 'create', '', 'required')}}>
             </div>
             <div class="form-group">
                 <label>Category Name</label>
-                <input type="text" name="name" class="form-control form" required>
+                <input type="text" name="name" value="{{category.name}}" class="form-control form" required>
             </div>
             <div class="form-group">
-                <label>Order Index</label>
-                <input type="number" name="rank" class="form-control form" min="1" required>
+                <label>Relative Rank</label>
+                <input type="number" name="rank" value="{{category.rank || ''}}" class="form-control form" min="1" required>
             </div>
             <div class="form-group">
                 <label>Parent Category</label>
-                <select name="parentId" class="form-control" required>
-                    {{{ uk.component("optionsForCategoryPicker") }}}
+                <select name="parentId" class="form-control" data-NOT-required>
+                    {{{ uk.component("optionsForCategoryPicker", {"selectedId": category.parentId || ''}) }}}
                 </select>
             </div>
-            <div class="form-group">
             <div class="form-group">
                 <button class="btn btn-primary">Submit</button>
                 <span class="btn btn-light btn-sm bootbox-close-button">Cancel</span>
@@ -56,14 +67,35 @@
     <script type="text/html" id="catNode" data-as="catNode"> <!-- /> -->
         <%
             let category = m.o.categoryMap[catNode._id];
-            let articleList = m.articleLister.c.combo.categoryArticlesMap[category._id];
+            let articleList = [];
+            if (category && category._id !== null) {
+                // Note: category._id == "" __IS__ allowed.
+                articleList = m.articleLister.c.combo.categoryArticlesMap[category._id];
+            }
         %>
         <div class="arbitarary-catNode">
             <% if (catNode._id) { %>
-                <button class="btn btn-light btn-sm" onclick="alert('This button does not do anything, yet.');">
-                    <i class="fa fa-fw fa-bars"></i>
-                </button>&nbsp;
-                <h4 class="inlineBlock">{{category.name}}</h4>
+                <div class="dropdown inlineBlock">
+                    <button class="btn btn-light btn-sm dropdown-toggle" type="button"
+                        id="aria--dropdown-categoryId-{{catNode._id}}"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                    >
+                        <i class="fa fa-fw fa-bars"></i>
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="aria--dropdown-categoryId-{{catNode._id}}">
+                        <a class="dropdown-item cursorPointer" data-on="click"
+                            data-call="/articleLister/onClick_editCategory" data-lit-arg="{{catNode._id}}"
+                        >
+                            <i class="fa fa-fw fa-edit"></i> Edit
+                        </a>
+                        <a class="dropdown-item cursorPointer" data-on="click"
+                            data-call="/articleLister/onClick_deleteCategory" data-lit-arg="{{catNode._id}}"
+                        >
+                            <i class="fa fa-fw fa-trash"></i> Delete
+                        </a>
+                    </div>
+                </div>
+                <h4 class="inlineBlock">{{category && category.name}}</h4>
             <% } %>
             <div class="">
                 <!-- Articles directly in `category`. -->
@@ -193,8 +225,14 @@
                         <div class="col-md">
                             <div class="form-group">
                                 <label>Category</label>
-                                <select name="categoryId" class="form-control" data-NOT-required>
-                                    {{{ uk.component("optionsForCategoryPicker") }}}
+                                <select name="categoryId" value="{{m.articleEditor.c.article.categoryId}}"
+                                    class="form-control" data-NOT-required
+                                >
+                                    {{{
+                                        uk.component("optionsForCategoryPicker", {
+                                            "selectedId": m.articleEditor.c.article.categoryId,
+                                        })
+                                    }}}
                                 </select>
                             </div>
                         </div>

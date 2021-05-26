@@ -12,7 +12,7 @@ var al = {"id": "articleLister", "o": {}, "c": {}};
 
 
 // Observables & Computeds:
-al.c.articleList = app.o.articleMap.list,   // Alias, snap-friendly.
+al.c.articleList = app.o.articleMap.list;   // Alias, snap-friendly.
 al.c.categoryList = app.o.categoryMap.list; // Alias, snap-friendly.
 
 al.c.combo = uk.computed(function () {
@@ -148,23 +148,54 @@ al.onClick_createArticle = async function () {
     });
 };
 
-al.onClick_createCategory = async function () {
-    app.modalComponent("modalbox_createCategory", {}, {});
+al.onClick_createCategory = function () {
+    app.modalComponent("modalbox_createOrEditCategory", {
+        "mode": "create",
+        "categoryId": "",
+    });
 };
-al.onSubmit_createCategory = async function (event) {
+al.onClick_editCategory = function (categoryId) {
+    app.modalComponent("modalbox_createOrEditCategory", {
+        "mode": "edit",
+        "categoryId": categoryId,
+    });
+};
+al.onSubmit_createOrEditCategory = async function (event) {
     const form = event.currentTarget;
+    const mode = form.mode.value;
+    let endpoint = "";
+    if (mode === "create" || mode === "edit") {
+        endpoint = "/categoryCon/" + mode + "Category";
+    } else {
+        misc.alert("Error: Mode detection failed.");
+        return null;    // Short ckt.
+    }
     const dataToSend = {
         "name": form.name.value,
         "rank": Number(form.rank.value),
         "parentId": form.parentId.value,
+        "categoryId": form.categoryId.value || "",          // Req'd in 'edit' mode.
     };
     $(form).find(".bootbox-close-button").click();
-    misc.spinner.start("Creating ...");
-    var resp = await misc.postJson("/categoryCon/createCategory", dataToSend);
+    misc.spinner.start("Processing ...");
+    var resp = await misc.postJson(endpoint, dataToSend);
     var category = resp.category;
     app.o.categoryMap.updateOne(category);
     misc.spinner.stop();
-    misc.alert("Done! Category created.");
+    misc.alert("Done!");
+};
+al.onClick_deleteCategory = async function (categoryId) {
+    let category = app.o.categoryMap.get()[categoryId];
+    let sure = await misc.confirm("Are you sure about deleting this category?");
+    if (! sure) { return null; }    // Short ckt.
+    let dataToSend = {
+        "categoryId": categoryId,
+    };
+    misc.spinner.start("Deleting ...");
+    var resp = await misc.postJson("/categoryCon/deleteCategory", dataToSend);
+    app.o.categoryMap.pop(resp.deletedCategoryId);
+    misc.spinner.stop();
+    misc.alert("Done! Category deleted.");
 };
 
 module.exports = al;
