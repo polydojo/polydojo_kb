@@ -27,6 +27,7 @@ ALLOWED_TAGS = DEFAULT_ALLOWED_TAGS + [
     "font", # WYSIWYGs use this for setting font.
     "u",    # Commonly used in WYSIWYG editing.
     "hr",
+    "iframe",
 ];
 
 # Allowed Attributes: ::::::::::::::::::::::::::::::::::::::
@@ -43,7 +44,7 @@ ALLOWED_ATTRIBUTES.update({
     "img": ["src", "height", "width"],
     "*": ["class", "style"],                                            # 'style' req'd in ALLOWED_ATTRIBUTES, and ALLOWED_STYLES too.
     "font": ["color"],
-    #TODO: "iframe": ["src", "class", "width", "height", "frameborder"],
+    "iframe": ["src", "width", "height", "frameborder"],
 });
 
 # Allowed Styles: ::::::::::::::::::::::::::::::::::::::::::

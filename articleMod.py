@@ -76,7 +76,7 @@ articleAdp = stdAdpBuilder.buildStdAdp(
 );
 
 @articleAdp.addStepAdapter
-def stepAdapterCore_from_0_to_1 (articleY):                    # Note: This _CANNOT_ be a lambda as `addStepAdapter` relies on .__name__
+def stepAdapterCore_from_0_to_1 (articleY):                 # Note: This _CANNOT_ be a lambda as `addStepAdapter` relies on .__name__
     # article._v: 0 --> 1
     # Renamed:
     #   ~ scratchpad --> body
@@ -88,6 +88,15 @@ def stepAdapterCore_from_0_to_1 (articleY):                    # Note: This _CAN
         "categoryId": "",
         "sectionId": "",
     });
+
+#@articleAdp.addStepAdapter
+#def stepAdapterCore_from_0_to_1 (articleY):                # Note: This _CANNOT_ be a lambda as `addStepAdapter` relies on .__name__
+#    # article._v: X --> Y
+#    # Added:
+#    #   + foo
+#    articleY.update({
+#        "foo": "foobar",
+#    });
 
 assert articleAdp.getStepCount() == K.CURRENT_ARTICLE_V;
 

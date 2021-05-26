@@ -16,11 +16,80 @@
     <title>Polydojo KB</title>
 </head>
 <body class="container">
+
+    <script type="text/html" id="optionsForCategoryPicker" data-as="sm"> <!-- /> -->
+        <% _.each(m.articleLister.c.combo.catDropOptList, function (catDropOpt) { %>
+            <option value="{{catDropOpt.value}}">{{catDropOpt.text}}</option>
+        <% }); %>
+    </script>
+
+    <script type="text/html" id="modalbox_createCategory" data-as="sm"> <!-- /> -->
+        <form data-on="submit" data-call="/articleLister/onSubmit_createCategory">
+            <div class="form-group">
+                <h3>New Category</h3>
+                <hr>
+            </div>
+            <div class="form-group">
+                <label>Category Name</label>
+                <input type="text" name="name" class="form-control form" required>
+            </div>
+            <div class="form-group">
+                <label>Order Index</label>
+                <input type="number" name="rank" class="form-control form" min="1" required>
+            </div>
+            <div class="form-group">
+                <label>Parent Category</label>
+                <select name="parentId" class="form-control" required>
+                    {{{ uk.component("optionsForCategoryPicker") }}}
+                </select>
+            </div>
+            <div class="form-group">
+            <div class="form-group">
+                <button class="btn btn-primary">Submit</button>
+                <span class="btn btn-light btn-sm bootbox-close-button">Cancel</span>
+                <!-- XXX:Note: .bootbox-close-button is equivalent to clicking the top-right 'X' btn. -->
+            </div>
+            <hr>
+        </form>
+    </script>
+    
+    <script type="text/html" id="catNode" data-as="catNode"> <!-- /> -->
+        <%
+            let category = m.o.categoryMap[catNode._id];
+            let articleList = m.articleLister.c.combo.categoryArticlesMap[category._id];
+        %>
+        <div class="arbitarary-catNode">
+            <% if (catNode._id) { %>
+                <button class="btn btn-light btn-sm" onclick="alert('This button does not do anything, yet.');">
+                    <i class="fa fa-fw fa-bars"></i>
+                </button>&nbsp;
+                <h4 class="inlineBlock">{{category.name}}</h4>
+            <% } %>
+            <div class="">
+                <!-- Articles directly in `category`. -->
+                <% _.each(articleList, function (article) { %>
+                    <div class="mb-1" style="font-size: 20px;">
+                        <button class="btn btn-light btn-sm" onclick="alert('This button does not do anything, yet.');">
+                            <i class="fa fa-fw fa-bars"></i>
+                        </button>&nbsp;
+                        <a href="?id=articleEditor&amp;articleId={{article._id}}">{{ article.title }}</a>
+                    </div>
+                <% }); %>
+                <p></p>
+                <!-- Child categories: -->
+                <% _.each(catNode.childNodes, function (childCatNode) { %>
+                    <div class="pl-4">{{{ uk.component("catNode", childCatNode) }}}</div>
+                <% }); %>
+            </div>
+        </div>
+    </script>
+    
     <script type="text/html" id="ukSource"> <!-- /> -->
         <%
             window.model = model;
             var m = uk.snapshot(model);
             window.m = m;
+            window.K = m.K;
         %>
         <header class="">
             <div class="dropdown float-right mt-1">
@@ -59,10 +128,29 @@
         <div class="{{ m.router.ifRoute('articleLister') }}" id="articleLister">
             <% if (m.router.c.activeId === "articleLister") { %>
                 <header>
-                    <div class="floatRight">
-                        <button class="btn btn-light" data-on="click" data-call="/articleLister/onClick_createArticle">
-                            <i class="fa fa-fw fa-plus"></i> Create Article
+                    <div class="btn-group floatRight">
+                        <button type="button" class="btn btn-light" data-on="click" data-call="/articleLister/onClick_createArticle">
+                            <i class="fa fa-fw fa-newspaper"></i> New Article
                         </button>
+                        <button type="button" class="btn btn-light dropdown-toggle dropdown-toggle-split"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                        >
+                            <span class="sr-only">Toggle Dropdown</span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            <a class="dropdown-item cursorPointer" data-on="click" data-call="/articleLister/onClick_createCategory">
+                                <i class="fa fa-fw fa-folder-plus"></i> New Category
+                            </a>
+                        </div>
+                    </div>
+                    <div class="floatRight d-none">
+                        <button class="btn btn-light" data-on="click" data-call="/articleLister/onClick_createArticle">
+                            <i class="fa fa-fw fa-plus"></i> New Article
+                        </button>
+                        <button class="btn btn-light btn-sm" data-on="click" data-call="/articleLister/onClick_createCategory">
+                            <i class="fa fa-fw fa-plus"></i> New Category
+                        </button>
+                        
                     </div>
                     <h3>Articles</h3>
                     <br>
@@ -70,19 +158,13 @@
                 <% if (m.articleLister.c.articleList.length === 0) { %>
                     <p class="centerText large">
                         <br><br>
-                        No articles yet. Get started by clicking <i>"Create Article"</i> above.
+                        No articles yet. Get started by clicking <i>"New Article"</i> above.
                         <br><br>
                     </p>
                 <% } %>
-                <ul>
-                    <% _.each(m.articleLister.c.articleList, function (article) { %>
-                        <li>
-                            <h4>
-                                <a href="?id=articleEditor&amp;articleId={{article._id}}">{{ article.title }}</a>
-                            </h4>
-                        </li>
-                    <% }); %>
-                </ul>
+                
+                {{{ uk.component("catNode", m.articleLister.c.combo.topCatNode) }}}
+
             <% } %><!-- end route guard -->
         </div><!-- end route 'articleLister' -->
         
@@ -107,22 +189,30 @@
                             >{{m.articleEditor.c.article.body}}</textarea>
                         <!-- one-way mToV binding-->
                     </div>
-                    <!--TODO:
                     <div class="row">
                         <div class="col-md">
                             <div class="form-group">
                                 <label>Category</label>
-                                <input type="text" class="form-control" disabled>
+                                <select name="categoryId" class="form-control" data-NOT-required>
+                                    {{{ uk.component("optionsForCategoryPicker") }}}
+                                </select>
                             </div>
                         </div>
                         <div class="col-md">
+                            <!-- TODO: Status dropdown.
                             <div class="form-group">
-                                <label>Section</label>
-                                <input type="text" class="form-control" disabled>
+                                <label>Status</label>
+                                <select name="status" class="form-control" required>
+                                    <% _.each(m.K.ARTICLE_STATUS_LIST, function (status) { %>
+                                        <option value="{{status}}">
+                                            {{status.split("_").join(" ").toUpperCase()}}
+                                        </option>
+                                    <% }); %>
+                                </select>
                             </div>
+                            -->
                         </div>
                     </div>
-                    -->
                     <div class="form-group">
                         <button class="btn btn-primary">
                             <i class="fa fa-fw fa-save"></i> Save

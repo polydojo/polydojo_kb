@@ -1,8 +1,13 @@
 var $ = require("jquery");
 var _ = require("underscore");
 var Cookies = require("js-cookie");
+var bootbox = require("bootbox");
+window.bootbox = bootbox;
 
 var misc = {Cookies: Cookies};
+misc.pretty = function (x, indent) {
+    return JSON.stringify(uk.toJs(x), null, indent || 4);
+};
 
 
 // SPINNER:
@@ -36,6 +41,40 @@ misc.spinner = (function () {
     return sp;
 }());
 
+// Bootbox Related: ::::::::::::::::::::::::::::::::::::::::
+misc.rawBootboxPromise = function (funcName, x) {
+    if (_.isString(x)) {
+        //return new Promise(resolve => bootbox[funcName](x, resolve));                                 // <-- One line version
+        return new Promise(function (resolve, reject) {
+            bootbox[funcName](x, resolve);
+        });
+    } else if ($.isPlainObject(x) && ! _.has(x, "callback")) {
+        // return new Promise(resolve => bootbox[funcName](_.extend({}, x, {"callback": resolve})));    // <-- One line version
+        return new Promise(function (resolve, reject) {
+            let xWithCb = _.extend({}, x, {"callback": resolve});                   // Using _.extend({}, ...) to ensure non-aliasing.
+            //console.log("xWithCb ="); console.log(xWithCb);
+            bootbox[funcName](xWithCb);
+        });
+    } else {
+        console.log(x);
+        throw new Error("misc.rawBootboxPromise: Expected string or object without 'callback' property, not " + x);
+    }
+};
+//
+misc.alertRaw = x => misc.rawBootboxPromise("alert", x);
+misc.promptRaw = x => misc.rawBootboxPromise("prompt", x);
+misc.confirmRaw = x => misc.rawBootboxPromise("confirm", x);
+//
+misc.alertText = s => misc.alertRaw("<span class='preWrap'>" + _.escape(s) + "</span>");      // Note: .preWrap is def'nd in helpers.css
+misc.alertJson = x => misc.alertRaw("<pre>" + _.escape(misc.pretty(x)) + "</pre>");
+misc.promptText = s => misc.promptRaw("<span class='preWrap'>" + _.escape(s) + "</span>");
+misc.confirmText = s => misc.confirmRaw("<span class='preWrap'>" + _.escape(s) + "</span>");
+//
+misc.alert = misc.alertText;      // Alias, short w/ safe default.
+misc.prompt = misc.promptText;    // Alias, short w/ safe default.
+misc.confirm = misc.confirmText;  // Alias, short w/ safe default.
+
+// AJAX Posting:
 misc.postJson = async function (url, data, success) {
     if (! _.isString(data)) { data = JSON.stringify(data); }
     var ajaxOpt = {
@@ -53,6 +92,7 @@ misc.postJson = async function (url, data, success) {
     return $.ajax(ajaxOpt);
 };
 
+// Error Handlign
 $(document).ajaxError(function (event, jqXhr) {
     window.jqXhr = jqXhr;
     //console.log(jqXhr.responseText);
@@ -62,17 +102,17 @@ $(document).ajaxError(function (event, jqXhr) {
         var reason = jqXhr.responseJSON.reason;
         if (reason.toLowerCase().split(" ").join("").includes("logout")) {
             // ==> Force logout
-            alert("Error: " + reason);
+            misc.alert("Error: " + reason);
             location.href = "/logout";
         } else {
             // ==> Needn't force logout.
-            alert("Error: " + reason);
+            misc.alert("Error: " + reason);
         }
     } else if (jqXhr.status === 0) {
-        alert("Network error, please check your Internet connection and retry.");
+        misc.alert("Network error, please check your Internet connection and retry.");
     } else {
         // Unknown error:
-        alert("An unknown error occured. | Status Code: " + jqXhr.status);
+        misc.alert("An unknown error occured. | Status Code: " + jqXhr.status);
     }
     misc.spinner.stop();
 });
@@ -93,3 +133,4 @@ misc.frameBreak = function () {
 
 
 module.exports = misc;
+window.misc = misc;

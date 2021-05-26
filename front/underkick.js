@@ -1022,10 +1022,9 @@ var underkick = function (ukConfig) {
     uk.toJson = function (x) { return JSON.stringify(uk.toJs(x)); };
     uk.fromJson = JSON.parse;
     uk.toPrettyJson = function (x, indent) {
-        indent = indent || 4;
-        var spacing = _.map(_.range(indent), function () { return " "; }).join("");
-        return JSON.stringify(uk.toJs(x), null, spacing);
+        return JSON.stringify(uk.toJs(x), null, indent || 4);
     };
+    uk.pretty = uk.toPrettyJson; // Alias, short.
     uk.deepCopy = function (x) {
         "Very similar to, but not the same as, `uk.toJs`.";
         if (puk.isPrimitive(x)) { return x; }

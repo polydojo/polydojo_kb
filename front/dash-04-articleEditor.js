@@ -43,6 +43,7 @@ ae.onSubmit_saveArticle = async function (event) {
         "articleId": ae.o.articleId.get(),
         "title": form.title.value,
         "body": form.bodyArea.value,
+        "categoryId": form.categoryId.value,
     };
     misc.spinner.start("Saving ...");
     const resp = await misc.postJson("/articleCon/updateArticle", dataToSend);

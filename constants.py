@@ -50,9 +50,6 @@ X.AUTH_COOKIE_SECRET = "auth-cookie-secret::" + X.SECRET_KEY;
 X.ANTI_CSRF_SECRET = "anti-csrf-secret::" + X.SECRET_KEY;
 U.REMEMBER_ME_DAY_COUNT = 30;                               # Available @ client, visible in (httpOnly) cookie anyway.
 
-U.GH_REPO_URL = "https://github.com/polydojo/polydojo_kb";
-
-
 X.DATABASE_URL = envi.read("DATABASE_URL");
 
 X.S3 = {
@@ -86,6 +83,13 @@ X.CURRENT_FUPLOAD_V = 0;
 X.EMAIL_RE = r'^\S+@\S+\.\S+$';
 X.PASSWORD_RE = r'.{12,}';
 
+U.GH_REPO_URL = "https://github.com/polydojo/polydojo_kb";
+
+U.ARTICLE_STATUS_LIST = [
+    "draft",
+    "published_internally",
+    "published_externally",
+];
 
 # Anti-xss/mime-type related:
 X.COMMON_XSS_SAFE_MIME_TYPE_WHITELIST = ("""

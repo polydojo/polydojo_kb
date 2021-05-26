@@ -12,6 +12,7 @@ import bu;
 from appDef import app;
 from constants import K;
 import articleMod;
+import categoryMod;
 import utils;
 import auth;
 import bleachUp;
@@ -37,14 +38,19 @@ def post_articleCon_fetchArticleList ():
 @app.post("/articleCon/updateArticle")
 def post_articleCon_updateArticle ():
     jdata = bu.get_jdata(ensure="""
-        articleId, title, body,
+        articleId, title, body, categoryId,
     """);
     sesh = auth.getSesh();
     oldArticle = articleMod.getArticle(jdata.articleId);    # old => before update
+    assert oldArticle;
+    if jdata.categoryId:
+        newCategory = categoryMod.getCategory(jdata.categoryId);
+        assert newCategory;
     newArticle = utils.deepCopy(oldArticle);                # new => after update
     newArticle.update({
         "title": jdata.title,
         "body": bleachUp.bleachHtml(jdata.body),
+        "categoryId": jdata.categoryId,
     });
     assert articleMod.validateArticle(newArticle);
     if oldArticle != newArticle:

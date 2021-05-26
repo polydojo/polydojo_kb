@@ -2,6 +2,7 @@
     "private": true,
     "dependencies": {
         "@fortawesome/fontawesome-free": "^5.15.3",
+        "bootbox": "^5.5.2",
         "bootstrap": "^4.6.0",
         "dompurify": "^2.2.7",
         "jquery": "^3.6.0",
