@@ -46,15 +46,17 @@ ul.onSubmit_inviteForm = async function (evnet) {
         formEl.fname.value,
         formEl.lname.value,
         formEl.email.value,
+        formEl.accessLevel.value,
     );
     formEl.reset();
 };
-ul.sendInvite = async function (fname, lname, email) {
+ul.sendInvite = async function (fname, lname, email, accessLevel) {
     // Helper, for re/inviting a user.
     let dataToSend = {
         "invitee_fname": fname,
         "invitee_lname": lname,
         "invitee_email": email.trim().toLowerCase(),      // Normalized email, lowercase + trimmed.
+        "invitee_accessLevel": accessLevel,
     };
     misc.spinner.start("Processing ...");
     let resp = await misc.postJson("/userCon/inviteUser", dataToSend);
@@ -68,7 +70,10 @@ ul.sendInvite = async function (fname, lname, email) {
 };
 ul.onClick_reinvite = async function (thatUserId) {
     let thatUser = app.o.userMap.get()[thatUserId];
-    await ul.sendInvite(thatUser.fname, thatUser.lname, thatUser.email);
+    await ul.sendInvite(
+        thatUser.fname, thatUser.lname,
+        thatUser.email, thatUser.accessLevel,
+    );
 };
 
 // Re/Deactivating:

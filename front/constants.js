@@ -10,6 +10,12 @@ var K = {
         "draft",
         "published_internally",
         "published_externally"
+    ],
+    "USER_ACCESS_LEVEL_LIST": [
+        "reader",
+        "author",
+        "editor",
+        "admin"
     ]
 };
 

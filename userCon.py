@@ -27,6 +27,7 @@ def post_userCon_setupFirstUser ():
     user = userMod.buildUser(
         email=email, fname=fname, lname=lname, pw=pw,
         isRootAdmin=True, isVerified=True,
+        accessLevel=auth.alm.getMaxLevel(),
     );
     userMod.insertUser(user);
     return auth.sendAuthSuccessResponse(user);
@@ -103,8 +104,10 @@ def sendInviteEmail (invitee, veriCode):
 def post_userCon_inviteUser ():
     jdata = bu.get_jdata(ensure="""
         invitee_fname, invitee_lname, invitee_email,
+        invitee_accessLevel,
     """);
     sesh = auth.getSesh();
+    assert auth.validateAccessLevel("admin", sesh.user);
     inviter = sesh.user;
     invitee = userMod.getUserByEmail(jdata.invitee_email);
     newVeriCode = userMod.genVeriCode();
@@ -116,6 +119,7 @@ def post_userCon_inviteUser ():
             lname = jdata.invitee_lname,
             inviterId = inviter._id,
             veriCode = newVeriCode,
+            accessLevel = jdata.invitee_accessLevel,
         );
     else:
         # ==> Invitee already exists. (re-invite)
@@ -127,6 +131,7 @@ def post_userCon_inviteUser ():
             "lname": jdata.invitee_lname,
             "inviterId": inviter._id,                           # <-- Here, we're updating to latest inviter's id.
             "hVeriCode": utils.hashPw(newVeriCode),             # <-- On reinvite, new veriCode is gen'd, prev one expires.
+            "accessLevel": jdata.invitee_accessLevel,
         });
         assert invitee.email == jdata.invitee_email;            # <-- fname/lname/inviterId/hVeriCode can change, but not email.
     # ==> `invitee` object is now available.
@@ -184,6 +189,7 @@ def post_userCon_acceptInvite ():
 def post_userCon_toggleUser_isDeactivated ():
     jdata = bu.get_jdata(ensure="thatUserId, preToggle_isDeactivated");
     sesh = auth.getSesh();
+    assert auth.validateAccessLevel("admin", sesh.user);
     thatUser = userMod.getUser({
         "_id": jdata.thatUserId,
         "isDeactivated": jdata.preToggle_isDeactivated,     # This helps ensure that we don't accidently perform the opposite op.

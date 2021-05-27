@@ -279,7 +279,7 @@
                             <div class="form-group">
                                 <label>
                                     Status
-                                    <span class="xSmall gray monospace">&nbsp;(Feature preview, NOT yet implemented.)</span>
+                                    <span class="small gray">&nbsp;(Feature preview, not fully implemented.)</span>
                                 </label>
                                 <select name="status" value="{{m.articleEditor.c.article.status}}" class="form-control" required>
                                     <% _.each(m.K.ARTICLE_STATUS_LIST, function (status) { %>
@@ -340,6 +340,14 @@
                             <input type="email" name="email" class="form-control" required>
                         </div>
                         <div class="form-group">
+                            <label>Access Level</label>
+                            <select name="accessLevel" class="form-control" required>
+                                <% _.each(m.K.USER_ACCESS_LEVEL_LIST, function (accessLevel) { %>
+                                    <option value="{{accessLevel}}">{{accessLevel.toUpperCase()}}</option>
+                                <% }); %>
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <button class="btn btn-primary"><i class="fa fa-fw fa-chevron-right"></i> Submit</button>
                         </div>
                     </form>
@@ -370,11 +378,11 @@
                                 </div>
                             </div>
                             &nbsp;
-                            <a class="cursorPointer" data-on="click" data-call="/onClick_toggleDropdownByBtnId"
+                            <span class="cursorPointer" data-on="click" data-call="/onClick_toggleDropdownByBtnId"
                                 data-lit-arg="ddBtnFor-user-{{user._id}}"
                             >
                                 {{user.fname}} {{user.lname}} <small class="">{{user.email}}</small>
-                            </a>
+                            </span>
                         </li>
                     <% }); %>
                 </ul>

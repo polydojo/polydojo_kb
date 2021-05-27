@@ -17,12 +17,13 @@ import mongo;
 import utils;
 import bu;
 import hashUp;
+import stdAdpBuilder;
 
 ############################################################
 # Assertions & indexing:                                   #
 ############################################################
 
-assert K.CURRENT_USER_V == 0;
+assert K.CURRENT_USER_V == 1;
 db = dotsi.fy({"userBox": mongo.db.userBox});   # Isolate
 db.userBox.create_index([
     ("email", pymongo.ASCENDING),
@@ -32,7 +33,10 @@ db.userBox.create_index([
 # User building and validation:                            #
 ############################################################
 
-validateUser = vf.dictOf({
+def genVeriCode ():
+    return secrets.token_urlsafe();
+
+_validateUserFormat = vf.dictOf({
     "_id": utils.isObjectId,
     "_v": lambda x: x == K.CURRENT_USER_V,
     #
@@ -45,23 +49,31 @@ validateUser = vf.dictOf({
     ),
     "hpw": vf.typeIs(str),  # Hashed PW
     "createdAt": utils.isInty,
-    "isRootAdmin": vf.typeIs(bool),
     "isVerified": vf.typeIs(bool),
     "hVeriCode": vf.typeIs(str),
-    "isDeactivated": vf.typeIs(bool),
     "inviterId": lambda x: x == "" or utils.isObjectId(x),
+    "isDeactivated": vf.typeIs(bool),
     "hResetPw": vf.typeIs(str), # Hashed Reset-PW
     "resetPwExpiresAt": utils.isInty,
+    "isRootAdmin": vf.typeIs(bool),
+    #
+    # Intro'd in _v1:
+    #
+    "accessLevel": lambda x: x in K.USER_ACCESS_LEVEL_LIST,
 });
 
-def genVeriCode ():
-    return secrets.token_urlsafe();
+def validateUser (user):
+    assert _validateUserFormat(user);
+    if user.isRootAdmin:
+        assert user.accessLevel == "admin";
+    return True;
 
 def buildUser (
         email, fname, lname="", pw="", isRootAdmin=False,
         isVerified=False, inviterId="", veriCode=None,
+        accessLevel = K.USER_ACCESS_LEVEL_LIST[0],
     ):
-    assert K.CURRENT_USER_V == 0;
+    assert K.CURRENT_USER_V == 1;
     assert fname and email;
     assert type(fname) == type(email) == str and "@" in email;
     userId = utils.objectId();
@@ -72,6 +84,7 @@ def buildUser (
         "_v": K.CURRENT_USER_V,
         #
         # Intro'd in _v0:
+        #
         "fname": fname,
         "lname": lname,
         "email": email,
@@ -84,6 +97,10 @@ def buildUser (
         "hResetPw": "",
         "resetPwExpiresAt": 0,
         "isRootAdmin": isRootAdmin,
+        #
+        # Intro'd in _v1:
+        #
+        "accessLevel": accessLevel,
     });
 
 def snipUser (user):
@@ -93,10 +110,49 @@ def snipUser (user):
     return utils.pick(user, lambda k: k not in sensitiveKeyList);
 
 ############################################################
-# Adapting: <-- TODO
+# Adapting:
 ############################################################
 
-userAdp = dotsi.fy({"adapt": lambda x, y=0: dotsi.fy(x)});
+userAdp = stdAdpBuilder.buildStdAdp(
+    str_fooBox = "userBox",
+    str_CURRENT_FOO_V = "CURRENT_USER_V",
+    int_CURRENT_FOO_V = K.CURRENT_USER_V,
+    func_validateFoo = validateUser,
+);
+
+@userAdp.addStepAdapter
+def stepAdapterCore_from_0_to_1 (userY):                    # Note: This _CANNOT_ be a lambda as `addStepAdapter` relies on .__name__
+    # user._v: 0 --> 1
+    # Added:
+    #   + accessLevel
+    i = -1 if userY.isRootAdmin else 0;                     # Highest (last index) access level for root admin, else lowest.
+    userY.update({
+        "accessLevel": K.USER_ACCESS_LEVEL_LIST[i],
+    });
+
+#@userAdp.addStepAdapter
+#def stepAdapterCore_from_X_to_Y (userY):                   # Note: This _CANNOT_ be a lambda as `addStepAdapter` relies on .__name__
+#    # user._v: X --> Y
+#    # Added:
+#    #   + foo
+#    userY.update({
+#        "foo": "foobar",
+#    });
+
+assert userAdp.getStepCount() == K.CURRENT_USER_V;
+
+# Adaptation Checklist:
+# Assertions will help you.
+# You'll need to look at:
+#   + constants.py
+#   + userMod.py
+#       + top (K) assertion
+#       + define stepAdapterCore_from_X_to_Y
+#       + modify builder/s as needed
+#       + modify validator/s as needed
+#       + modify snip/s if any, as needed
+#   + userCon.py and others:
+#       + modify funcs that call userMod's funcs.
 
 ############################################################
 # Getting:

@@ -21,6 +21,7 @@ import auth;
 def post_categoryCon_createCategory ():
     jdata = bu.get_jdata(ensure="name rank parentId");
     sesh = auth.getSesh();
+    assert auth.validateAccessLevel("author", sesh.user);
     category = categoryMod.buildCategory(
         creatorId = sesh.user._id,
         name = jdata.name,
@@ -42,6 +43,7 @@ def post_categoryCon_editCategory ():
     sesh = auth.getSesh();
     oldCategory = categoryMod.getCategory(jdata.categoryId);    # old => before update
     assert oldCategory and oldCategory._id;
+    assert auth.validateCategoryEditable(oldCategory, sesh.user);
     if jdata.parentId and jdata.parentId != oldCategory.parentId:
         assert jdata.categoryId != jdata.parentId;
         newKaParent = categoryMod.getCategory(jdata.parentId);
@@ -63,6 +65,7 @@ def post_categoryCon_deleteCategory ():
     sesh = auth.getSesh();
     category = categoryMod.getCategory(jdata.categoryId);
     assert category;
+    assert auth.validateCategoryDeletable(category, sesh.user);
     articleCount = articleMod.getArticleCount({
         "categoryId": category._id,
     });
@@ -70,7 +73,7 @@ def post_categoryCon_deleteCategory ():
         "parentId": category._id,                               # i.e. child.parentId == category._id;
     });
     if not (articleCount == 0 == childCategoryCount):
-        return bu.abort("Error: Can't delete non-empty categories.");
+        return bu.abort("Can't delete non-empty categories.");
     assert articleCount == 0 == childCategoryCount;
     categoryMod.deleteCategory(category);
     return {"deletedCategoryId": category._id};

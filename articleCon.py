@@ -22,6 +22,7 @@ import bleachUp;
 def post_articleCon_createArticle ():
     jdata = bu.get_jdata(ensure="title");
     sesh = auth.getSesh();
+    assert auth.validateAccessLevel("author", sesh.user);
     article = articleMod.buildArticle(
         creatorId = sesh.user._id,
         title = jdata.title,
@@ -33,7 +34,10 @@ def post_articleCon_createArticle ():
 @app.post("/articleCon/fetchArticleList")
 def post_articleCon_fetchArticleList ():
     sesh = auth.getSesh();
-    return {"articleList": articleMod.getArticleList()};
+    #return {"articleList": articleMod.getArticleList()};
+    return {
+        "articleList": auth.getUserReadableArticleList(sesh.user),
+    };
 
 @app.post("/articleCon/updateArticle")
 def post_articleCon_updateArticle ():
@@ -43,6 +47,7 @@ def post_articleCon_updateArticle ():
     sesh = auth.getSesh();
     oldArticle = articleMod.getArticle(jdata.articleId);    # old => before update
     assert oldArticle;
+    assert auth.validateArticleEditable(oldArticle, sesh.user);
     if jdata.categoryId:
         newCategory = categoryMod.getCategory(jdata.categoryId);
         assert newCategory;
@@ -64,6 +69,7 @@ def post_articleCon_updateArticle ():
     sesh = auth.getSesh();
     article = articleMod.getArticle(jdata.articleId);
     assert article;
+    assert auth.validateArticleDeletable(article, sesh.user);
     # TODO:Periodic-review-reqd: Delete any inner/linked documents.
     articleMod.deleteArticle(article);
     return {"deletedArticleId": article._id};

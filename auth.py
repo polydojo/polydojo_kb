@@ -12,6 +12,8 @@ import bu;
 from constants import K;
 import utils;
 import userMod;
+import articleMod;
+import conAlm;
 
 ############################################################
 # Anti-CSRF related:                                       #
@@ -99,5 +101,85 @@ def getSesh (strict=True, validateCsrf=None, req=None):
         );
     # ==> User exists, is verified, non-deactivated.
     return dotsi.fy({"user": user});
+
+############################################################
+# Access Control: ##########################################
+############################################################
+
+alm = conAlm.build(K.USER_ACCESS_LEVEL_LIST);
+assert alm.getMinLevel() == "reader";
+assert alm.getMaxLevel() == "admin";
+
+def checkIfUserCanReadArticle (article, user):
+    canAnyUserRead = article.status in [
+        "published_internally", "published_externally",
+    ];
+    if canAnyUserRead:
+        return True;
+    # otherwise ...
+    if alm.contains(user.accessLevel, "editor"):
+        assert user.accessLevel in ["editor", "admin"];
+        return True;
+    # otherwise ...
+    if alm.contains(user.accessLevel, "author"):
+        return bool(article.creatorId == user._id);
+    # otherwise ...
+    assert user.accessLevel == "reader";
+    assert article.status == "draft";
+    return False;
+
+def getUserReadableArticleList (user):
+    return utils.filter(
+        articleMod.getArticleList({}),
+        lambda a: checkIfUserCanReadArticle(a, user),
+    );
+
+#XXX:Untested, commented out.
+#def getUserReadableArticleList (user):
+#    if alm.contains(user.accessLevel, "editor"):
+#        assert user.accessLevel in ["editor", "admin"];
+#        return articleMod.getArticleList({});
+#    # ==> Not editor+
+#    if alm.exceeds("author", user.accessLevel):
+#        assert user.accessLevel == "reader";
+#        return articleMod.getArticleList({
+#            "status": {"$ne": "draft"},
+#        });
+#    # ==> Not author+
+#    assert user.accessLevel == "author";
+#        return articleMod.getArticleList({
+#            "$or": [
+#                {"status": {"$ne": "draft"}},
+#                {"creatorId": user._id},
+#            ],
+#        });
+
+def validateAccessLevel(reqdAccessLevel, user):
+    ok = alm.contains(user.accessLevel, reqdAccessLevel);
+    if not ok:
+        raise bu.abort("Access level insufficient.");
+    # otherwise ... => ok
+    return True;
+
+def checkArticleEditable (article, user):
+    if alm.contains(user.accessLevel, "editor"):
+        assert user.accessLevel in ["editor", "admin"];
+        return True;    # Short ckt.
+    if not alm.contains(user.accessLevel, "author"):
+        assert user.accessLevel == "reader";
+        return False;   # Short ckt.
+    assert user.accessLevel == "author";
+    return bool(article.creatorId == user._id);
+
+def validateArticleEditable (article, user):
+    if not checkArticleEditable(article, user):
+        raise bu.abort("Access level insufficient.");
+    # otherwise ...
+    return True;
+validateCategoryEditable = validateArticleEditable;         # <-- For now, both article & category objs have `.creatorId`.
+
+validateArticleDeletable = validateArticleEditable;         # <-- For now, article deletability <==> editability.
+validateCategoryDeletable = validateCategoryEditable;       # <-- For now, category deletability <==> editability.
+
 
 # xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx

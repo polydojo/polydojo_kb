@@ -74,10 +74,9 @@ X.MEMFILE_MAX = 30 * 1000 * 1000; # ~ 30 MB
 
 X.USER_EMAIL_INDEX_NAME = "user_email_index";
 
-X.CURRENT_USER_V = 0;
+X.CURRENT_USER_V = 1;
 X.CURRENT_ARTICLE_V = 2;
 X.CURRENT_CATEGORY_V = 0;
-X.CURRENT_SECTION_V = 0;
 X.CURRENT_FUPLOAD_V = 0;
 
 X.EMAIL_RE = r'^\S+@\S+\.\S+$';
@@ -89,6 +88,13 @@ U.ARTICLE_STATUS_LIST = [
     "draft",
     "published_internally",
     "published_externally",
+];
+U.USER_ACCESS_LEVEL_LIST = [
+    # The entire web can read externally published articles.
+    "reader", # Can read internally published articles too. (Min level)
+    "author", # Further, can write articles and edit own drafts.
+    "editor", # Further, can edit other users' drafts.
+    "admin",  # Further, can invite/deactivate/etc users. (Max level)
 ];
 
 # Anti-xss/mime-type related:
