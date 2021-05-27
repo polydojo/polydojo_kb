@@ -55,6 +55,14 @@ app.modalComponent =  function (id, submodel, bootboxConfig) {
         "size": null,       // That's bootbox's default. Also accepts 'small' and 'large'.
     }, bootboxConfig));
 };
+app.onClick_toggleDropdownByBtnId = function (ddBtnId) {
+    let $ddBtn = $("#" + ddBtnId);
+    _.defer(function () {
+        // XXX: Can't explain the need for _.defer().
+        // TODO: Investigate IFF reqd.
+        $ddBtn.dropdown("toggle");
+    });
+};
 
 module.exports = {
     uk, app,

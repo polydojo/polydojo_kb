@@ -77,12 +77,12 @@
             <% if (catNode._id) { %>
                 <div class="dropdown inlineBlock">
                     <button class="btn btn-light btn-sm dropdown-toggle" type="button"
-                        id="aria--dropdown-categoryId-{{catNode._id}}"
+                        id="ddBtnFor_category_{{catNode._id}}"
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                     >
                         <i class="fa fa-fw fa-bars"></i>
                     </button>
-                    <div class="dropdown-menu" aria-labelledby="aria--dropdown-categoryId-{{catNode._id}}">
+                    <div class="dropdown-menu" aria-labelledby="ddBtnFor_category_{{catNode._id}}">
                         <a class="dropdown-item cursorPointer" data-on="click"
                             data-call="/articleLister/onClick_editCategory" data-lit-arg="{{catNode._id}}"
                         >
@@ -95,7 +95,11 @@
                         </a>
                     </div>
                 </div>
-                <h4 class="inlineBlock">{{category && category.name}}</h4>
+                <h4 class="inlineBlock cursorPointer" data-on="click" data-call="/onClick_toggleDropdownByBtnId"
+                    data-lit-arg="ddBtnFor_category_{{catNode._id}}"
+                >
+                    {{category && category.name}}
+                </h4>
             <% } %>
             <div class="">
                 <!-- Articles directly in `category`. -->
@@ -103,12 +107,15 @@
                     <div class="mb-1">
                         <div class="dropdown inlineBlock">
                             <button class="btn btn-light btn-sm dropdown-toggle" type="button"
-                                id="aria--dropdown-articleId-{{article._id}}"
+                                id="ddBtnFor_article_{{article._id}}"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                             >
                                 <i class="fa fa-fw fa-bars"></i>
                             </button>
-                            <div class="dropdown-menu" aria-labelledby="aria--dropdown-articleId-{{article._id}}">
+                            <div class="dropdown-menu" aria-labelledby="ddBtnFor_article_{{article._id}}">
+                                <a class="dropdown-item cursorPointer" href="?id=articleViewer&amp;articleId={{article._id}}">
+                                    <i class="fa fa-fw fa-eye"></i> View
+                                </a>
                                 <a class="dropdown-item cursorPointer" href="?id=articleEditor&amp;articleId={{article._id}}">
                                     <i class="fa fa-fw fa-edit"></i> Edit
                                 </a>
@@ -119,7 +126,11 @@
                                 </a>
                             </div>
                         </div>
-                        <a href="?id=articleEditor&amp;articleId={{article._id}}" style="font-size: 20px;">{{ article.title }}</a>
+                        <a class="cursorPointer" style="font-size: 20px;" data-on="click" data-call="/onClick_toggleDropdownByBtnId"
+                            data-lit-arg="ddBtnFor_article_{{article._id}}"
+                        >
+                            {{ article.title }}
+                        </a>
                     </div>
                 <% }); %>
                 <p></p>
@@ -214,6 +225,19 @@
 
             <% } %><!-- end route guard -->
         </div><!-- end route 'articleLister' -->
+
+
+        <!-- ROUTE: 'articleViewer' -->
+        <div class="{{ m.router.ifRoute('articleViewer') }}" id="articleViewer">
+            <% if (m.articleViewer.c.article && m.router.c.activeId === "articleViewer") { %>
+                <header>
+                    <h3>{{m.articleViewer.c.article.title}}</h3>
+                    <br>
+                </header>
+                <div class="">{{{ m.articleViewer.c.article.body }}}</div>
+                
+            <% } %><!-- end route guard -->
+        </div><!-- end route 'articleViewer' -->
         
 
         <!-- ROUTE 'articleEditor': -->
@@ -325,12 +349,19 @@
                         <li class="h4 {{uk.if(user.isDeactivated, 'darkGray', '')}}">
                             <div class="dropdown inlineBlock">
                                 <button class="btn btn-light btn-sm dropdown-toggle" type="button"
-                                    id="aria--dropdown-userId-{{user._id}}"
+                                    id="ddBtnFor-user-{{user._id}}"
                                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                                 >
                                     <i class="fa fa-fw fa-bars"></i>
                                 </button>
-                                <div class="dropdown-menu" aria-labelledby="aria--dropdown-userId-{{user._id}}">
+                                <div class="dropdown-menu" aria-labelledby="ddBtnFor-user-{{user._id}}">
+                                    <% if ((! user.isVerified) && (! user.isDeactivated)) { %>
+                                        <a class="dropdown-item cursorPointer" data-on="click"
+                                            data-call="/userLister/onClick_reinvite" data-lit-arg="{{user._id}}"
+                                        >
+                                            Reinvite
+                                        </a>
+                                    <% } %>
                                     <a class="dropdown-item cursorPointer" data-on="click"
                                         data-call="/userLister/onClick_toggle_isDeactivated" data-lit-arg="{{user._id}}"
                                     >
@@ -339,9 +370,11 @@
                                 </div>
                             </div>
                             &nbsp;
-                            <span>
+                            <a class="cursorPointer" data-on="click" data-call="/onClick_toggleDropdownByBtnId"
+                                data-lit-arg="ddBtnFor-user-{{user._id}}"
+                            >
                                 {{user.fname}} {{user.lname}} <small class="">{{user.email}}</small>
-                            </span>
+                            </a>
                         </li>
                     <% }); %>
                 </ul>
@@ -349,7 +382,7 @@
         </div><!-- end route 'userLister' -->
 
 
-        <!-- PLACEHOLDER ROUTE: -->
+        <!-- PLACEHOLDER ROUTE: '__route__name__' -->
         <div class="{{ m.router.ifRoute('__route__name__') }}" id="__route__name__">
             <% if (m.__your_condintion_here__ && m.router.c.activeId === "__route__name__") { %>
                 <header>

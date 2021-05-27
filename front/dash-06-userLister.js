@@ -61,10 +61,14 @@ ul.sendInvite = async function (fname, lname, email) {
     app.o.userMap.updateOne(resp.user);
     misc.spinner.stop();
     if (resp.inviteLink) {
-        Swal.fire({"text": "Done! Joining link: " + resp.inviteLink});
+        await misc.alert("Done! Joining link: " + resp.inviteLink);
     } else {
-        Swal.fire({"text": "Done! Invitation email sent."});
+        await misc.alert("Done! Invitation email sent.");
     }
+};
+ul.onClick_reinvite = async function (thatUserId) {
+    let thatUser = app.o.userMap.get()[thatUserId];
+    await ul.sendInvite(thatUser.fname, thatUser.lname, thatUser.email);
 };
 
 // Re/Deactivating:
@@ -80,7 +84,7 @@ ul.onClick_toggle_isDeactivated = async function (thatUserId) {
     let resp = await misc.postJson("/userCon/toggleUser_isDeactivated", dataToSend);
     app.o.userMap.updateOne(resp.user);
     misc.spinner.stop();
-    await Swal.fire({"text": "Done! User account " + z + "eactivated."});
+    await misc.alert("Done! User account " + z + "eactivated.");
 };
 
 // Close:

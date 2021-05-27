@@ -1,7 +1,7 @@
 // npm:
 var _ = require("underscore");
 var $ = require("jquery");
-var Swal = require('sweetalert2')["default"];
+var bootbox = require("bootbox");
 var __bootstrap = require("bootstrap");
 //var __popper = require("popper.js")["default"];
 
@@ -10,6 +10,7 @@ var misc = require("./misc.js");
 var {uk, app} = require("./dash-00-def.js");
 
 app.articleLister = require("./dash-03-articleLister.js");
+app.articleViewer = require("./dash-03.5-articleViewer.js");
 app.articleEditor = require("./dash-04-articleEditor.js");
 app.userLister = require("./dash-06-userLister.js");
 
@@ -26,7 +27,7 @@ app.detectLogin = async function () {
     return null;
 };
 
-$.extend(window, {$, _, uk, app, Swal}); // Pre-tpl-rendering.
+$.extend(window, {$, _, uk, app, bootbox}); // Pre-tpl-rendering.
 
 $(async function () {
     await app.detectLogin();

@@ -1,7 +1,6 @@
 // npm:
 var _ = require("underscore");
 var $ = require("jquery");
-var Swal = require('sweetalert2')["default"];
 var __summernote = require("summernote/dist/summernote-bs4.min.js");
 
 window.$ = $;
@@ -26,7 +25,9 @@ ae.c.article = uk.computed(
     [ae.o.articleId, app.o.articleMap]
 );
 
-ae.open = function (info) {
+ae.open = async function (info) {
+    await app.articleLister.fetchCategoryListIfReqd();
+    await app.articleLister.fetchArticleListIfReqd();
     ae.o.articleId.set(info.articleId);
     if (! ae.c.article.get()) {
         app.router.openDefault();
