@@ -66,7 +66,7 @@ categoryAdp = stdAdpBuilder.buildStdAdp(
 );
 
 #@categoryAdp.addStepAdapter
-#def stepAdapterCore_from_0_to_1 (categoryY):                 # Note: This _CANNOT_ be a lambda as `addStepAdapter` relies on .__name__
+#def stepAdapterCore_from_X_to_Y (categoryY):                 # Note: This _CANNOT_ be a lambda as `addStepAdapter` relies on .__name__
 #    # category._v: X --> Y
 #    # Added:
 #    #   + foo

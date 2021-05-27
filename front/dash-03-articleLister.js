@@ -147,6 +147,19 @@ al.onClick_createArticle = async function () {
         "articleId": article._id,
     });
 };
+al.onClick_deleteArticle = async function (articleId) {
+    let article = app.o.articleMap.get()[articleId];
+    let sure = await misc.confirm("Are you sure about deleting this article?");
+    if (! sure) { return null; }    // Short ckt.
+    let dataToSend = {
+        "articleId": articleId,
+    };
+    misc.spinner.start("Deleting ...");
+    var resp = await misc.postJson("/articleCon/deleteArticle", dataToSend);
+    app.o.articleMap.pop(resp.deletedArticleId);
+    misc.spinner.stop();
+    misc.alert("Done! Article deleted.");
+};
 
 al.onClick_createCategory = function () {
     app.modalComponent("modalbox_createOrEditCategory", {

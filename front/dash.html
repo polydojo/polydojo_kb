@@ -46,7 +46,7 @@
                 <input type="text" name="name" value="{{category.name}}" class="form-control form" required>
             </div>
             <div class="form-group">
-                <label>Relative Rank</label>
+                <label>Serial Number <span class="small gray">(for sorting)</span></label>
                 <input type="number" name="rank" value="{{category.rank || ''}}" class="form-control form" min="1" required>
             </div>
             <div class="form-group">
@@ -100,11 +100,26 @@
             <div class="">
                 <!-- Articles directly in `category`. -->
                 <% _.each(articleList, function (article) { %>
-                    <div class="mb-1" style="font-size: 20px;">
-                        <button class="btn btn-light btn-sm" onclick="alert('This button does not do anything, yet.');">
-                            <i class="fa fa-fw fa-bars"></i>
-                        </button>&nbsp;
-                        <a href="?id=articleEditor&amp;articleId={{article._id}}">{{ article.title }}</a>
+                    <div class="mb-1">
+                        <div class="dropdown inlineBlock">
+                            <button class="btn btn-light btn-sm dropdown-toggle" type="button"
+                                id="aria--dropdown-articleId-{{article._id}}"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                            >
+                                <i class="fa fa-fw fa-bars"></i>
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="aria--dropdown-articleId-{{article._id}}">
+                                <a class="dropdown-item cursorPointer" href="?id=articleEditor&amp;articleId={{article._id}}">
+                                    <i class="fa fa-fw fa-edit"></i> Edit
+                                </a>
+                                <a class="dropdown-item cursorPointer" data-on="click"
+                                    data-call="/articleLister/onClick_deleteArticle" data-lit-arg="{{article._id}}"
+                                >
+                                    <i class="fa fa-fw fa-trash"></i> Delete
+                                </a>
+                            </div>
+                        </div>
+                        <a href="?id=articleEditor&amp;articleId={{article._id}}" style="font-size: 20px;">{{ article.title }}</a>
                     </div>
                 <% }); %>
                 <p></p>
@@ -237,18 +252,19 @@
                             </div>
                         </div>
                         <div class="col-md">
-                            <!-- TODO: Status dropdown.
                             <div class="form-group">
-                                <label>Status</label>
-                                <select name="status" class="form-control" required>
+                                <label>
+                                    Status
+                                    <span class="xSmall gray monospace">&nbsp;(Feature preview, NOT yet implemented.)</span>
+                                </label>
+                                <select name="status" value="{{m.articleEditor.c.article.status}}" class="form-control" required>
                                     <% _.each(m.K.ARTICLE_STATUS_LIST, function (status) { %>
-                                        <option value="{{status}}">
+                                        <option value="{{status}}" {{uk.if(status === m.articleEditor.c.article.status, "selected")}}>
                                             {{status.split("_").join(" ").toUpperCase()}}
                                         </option>
                                     <% }); %>
                                 </select>
                             </div>
-                            -->
                         </div>
                     </div>
                     <div class="form-group">

@@ -19,7 +19,7 @@ import stdAdpBuilder;
 # Assertions & prelims:                                    #
 ############################################################
 
-assert K.CURRENT_ARTICLE_V == 1;
+assert K.CURRENT_ARTICLE_V == 2;
 db = dotsi.fy({"articleBox": mongo.db.articleBox});   # Isolate
     
 ############################################################
@@ -41,11 +41,15 @@ validateArticle = vf.dictOf({
     #
     "body": vf.typeIs(str),
     "categoryId": utils.isBlankOrObjectId,
-    "sectionId": utils.isBlankOrObjectId,
+    #"sectionId": utils.isBlankOrObjectId,  -- Removed in _v2
+    #
+    # Intro'd in _v2:
+    #
+    "status": lambda x: x in K.ARTICLE_STATUS_LIST,
 });
 
 def buildArticle (creatorId, title=""):
-    assert K.CURRENT_ARTICLE_V == 1;
+    assert K.CURRENT_ARTICLE_V == 2;
     return dotsi.fy({
         "_id": utils.objectId(),
         "_v": K.CURRENT_ARTICLE_V,
@@ -61,7 +65,11 @@ def buildArticle (creatorId, title=""):
         #
         "body": "",
         "categoryId": "",   # blank => Untitled, topmost category.
-        "sectionId": "",    # blank => Untitled, topmost section.
+        #"sectionId": "",           -- Removed in _v2
+        #
+        # Intro'd in _v2:
+        #
+        "status": "draft",
     });
 
 ############################################################
@@ -89,8 +97,18 @@ def stepAdapterCore_from_0_to_1 (articleY):                 # Note: This _CANNOT
         "sectionId": "",
     });
 
+@articleAdp.addStepAdapter
+def stepAdapterCore_from_1_to_2 (articleY):                 # Note: This _CANNOT_ be a lambda as `addStepAdapter` relies on .__name__
+    # article._v: 1 --> 2
+    # Added:
+    #   + status
+    # Removed
+    #   - sectionId
+    articleY.update({"status": "draft"});
+    articleY.pop("sectionId");
+
 #@articleAdp.addStepAdapter
-#def stepAdapterCore_from_0_to_1 (articleY):                # Note: This _CANNOT_ be a lambda as `addStepAdapter` relies on .__name__
+#def stepAdapterCore_from_X_to_Y (articleY):                # Note: This _CANNOT_ be a lambda as `addStepAdapter` relies on .__name__
 #    # article._v: X --> Y
 #    # Added:
 #    #   + foo

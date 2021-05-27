@@ -38,7 +38,7 @@ def post_articleCon_fetchArticleList ():
 @app.post("/articleCon/updateArticle")
 def post_articleCon_updateArticle ():
     jdata = bu.get_jdata(ensure="""
-        articleId, title, body, categoryId,
+        articleId, title, body, categoryId, status,
     """);
     sesh = auth.getSesh();
     oldArticle = articleMod.getArticle(jdata.articleId);    # old => before update
@@ -51,6 +51,7 @@ def post_articleCon_updateArticle ():
         "title": jdata.title,
         "body": bleachUp.bleachHtml(jdata.body),
         "categoryId": jdata.categoryId,
+        "status": jdata.status,
     });
     assert articleMod.validateArticle(newArticle);
     if oldArticle != newArticle:
@@ -62,7 +63,8 @@ def post_articleCon_updateArticle ():
     jdata = bu.get_jdata(ensure="articleId");
     sesh = auth.getSesh();
     article = articleMod.getArticle(jdata.articleId);
-    # TODO: Delete any inner/linked documents.
+    assert article;
+    # TODO:Periodic-review-reqd: Delete any inner/linked documents.
     articleMod.deleteArticle(article);
     return {"deletedArticleId": article._id};
 
