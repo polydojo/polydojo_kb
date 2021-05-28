@@ -54,6 +54,33 @@ def buildCategory (creatorId, name="", rank=0, parentId=""):
         "createdAt": utils.now(),
     });
 
+def checkCircularParentage (unsavedCategory):
+    # `unsavedCategory` should ideally be unsaved, but needn't be.
+    # A few examples of circular parentage:
+    #   ~ catA.parent -> catA                                       
+    #   ~ catA.parent -> catB  &  catB.parent -> catA               X --> Y --> Z
+    #   ~ X.parent -> Y,  Y.parent -> Z,  Z.parent -> X             ^-----<-----v
+    #   ~ etc.
+    currentCategory = unsavedCategory;
+    seenCategoryIds = set();
+    while currentCategory:
+        if currentCategory._id in seenCategoryIds:
+            # ==> Circular
+            return True;    # Short ckt.
+        # otherwise ...
+        seenCategoryIds.add(currentCategory._id);
+        # Loop:
+        currentCategory = getCategory(currentCategory.parentId);
+    # ==> Non-circular.
+    return False;
+
+def validateNonCircularParentage (unsavedCategory):
+    if checkCircularParentage(unsavedCategory):
+        raise bu.abort("Circular parentage detected.");
+    # ==> Non-circular, i.e. valid.
+    return True;
+    
+
 ############################################################
 # Adapting:
 ############################################################
