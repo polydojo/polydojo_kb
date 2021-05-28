@@ -22,6 +22,8 @@ X.APP_SCHEME = envi.read("ENFORCE_SCHEME");
 X.APP_NETLOC = envi.read("ENFORCE_NETLOC");
 X.SITE_URL = "%s://%s" % (X.APP_SCHEME, X.APP_NETLOC);
 
+X.DEBUG = bool(envi.read("DEBUG").upper() == "TRUE");       # XXX:Note: Case-insensitive comparison with __string__ "TRUE".
+
 
 X.REPO_DIR = os.path.abspath(os.path.dirname(__file__));    # Repository directory
 def repoSlash (*paths):
@@ -36,7 +38,7 @@ X.VIEW_DIR_PATHS = [
 ];
 
 X.SHORTCUT_MAP = {
-    "/": "/front/login.html",
+    #"/": "/front/login.html",
     "/setup": "/front/setup.html",
     "/login": "/front/login.html",
     "/logout": "/front/logout.html",
@@ -96,6 +98,21 @@ U.USER_ACCESS_LEVEL_LIST = [
     "editor", # Further, can edit other users' drafts.
     "admin",  # Further, can invite/deactivate/etc users. (Max level)
 ];
+U.TOP_BLANK_CATEGORY = {  # TOP-most category.
+    "_id": "",
+    "name": "",
+    "rank": 0,
+    "parentId": None, # `None`, not "", to avoid inf-recursion.
+    #
+    # Notes:
+    #
+    # This won't pass categoryMod.validateCategory, as it's
+    # not a fully valid category object. Not only is it
+    # missing ._v, .creatorId and other such properties,
+    # but also .parentId is `None`, which is a non-string.
+    # For all actual categories, .parentId must always be
+    # a (possibly empty) string.
+};
 
 # Anti-xss/mime-type related:
 X.COMMON_XSS_SAFE_MIME_TYPE_WHITELIST = ("""

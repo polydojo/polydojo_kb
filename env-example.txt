@@ -17,6 +17,10 @@ SECRET_KEY=__replace_with_a_randomly_generated_secure_token__
 # --------------------------------
 DATABASE_URL=
 
+# Debug Mode (for development)
+# ----------------------------
+DEBUG=False
+
 # SMTP (for sending emails)
 # -------------------------
 SMTP_HOST=

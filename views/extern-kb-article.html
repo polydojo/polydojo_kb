@@ -1,0 +1,44 @@
+@# Params: article, bleachUp
+<!doctype html>
+<html>
+<head>
+    <!-- TODO:Feature:: Allow custom favicon and title/etc. tag. -->
+    <link rel="shortcut icon" href="/front/img/logo/logo-192.png">
+    <link rel="apple-touch-icon" href="/front/img/logo/logo-192.png">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">    
+    
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/node_modules/@fortawesome/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="/node_modules/summernote/dist/summernote-bs4.css"><!-- pre-minified -->
+    <link rel="stylesheet" href="/front/helpers.css">
+    <link rel="stylesheet" href="/front/general.css">
+    <link rel="stylesheet" href="/front/dash.css">
+    
+    <title>Polydojo KB</title>
+</head>
+<body class="container">
+    <header>
+        <p><a href="/">KB Home</a></p>
+        <h4>Search</h4>
+        <form onsubmit="alert('Search functionality has not been implemented, yet.'); return false;">
+            <div class="form-group">
+                <input type="search" name="qtext" placeholder="Search ..." class="form-control NOT-form-control-lg">
+            </div>
+        </form>
+        <hr>
+    </header>
+
+    <div class="main">    
+        <h2>{{py: article.title}}</h2>
+        <div class="">{{py:! bleachUp.bleachHtml(article.body)}}</div>
+    </div>
+
+    <footer class="small gray">
+        <br><br><hr class="mb-2">
+        Powered by <!-- TODO: Set .ghRepoUrl's href via js. -->
+        <a class="unsetColor underline ghRepoUrl" href="https://github.com/polydojo/polydojo_kb" target="_blank">Polydojo KB</a>.
+    </footer>
+    
+</body>
+</html>

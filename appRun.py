@@ -12,6 +12,8 @@ import dotenv;
 # loc:
 # DELAYED
 
+print("");  # newline
+
 assert len(sys.argv) == 2;
 envFilename = sys.argv[1];
 for (key, value) in dotenv.dotenv_values(envFilename).items():
@@ -21,9 +23,13 @@ for (key, value) in dotenv.dotenv_values(envFilename).items():
 # loc:
 from constants import K;
 from appHub import app;
+import bu;
 
 def run ():
-    print("Serving @ %s:%s ..." % (K.RUN_HOST, K.RUN_PORT));
+    if K.DEBUG is True:
+        bu.bottle.debug(True);
+        print("Enabled DEBUG mode.");
+    print("Serving @ %s:%s ...\n" % (K.RUN_HOST, K.RUN_PORT));
     waitress.serve(app=app, host=K.RUN_HOST, port=K.RUN_PORT);
 
 # Run: #####################################################

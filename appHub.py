@@ -17,5 +17,6 @@ import staticCon;                                           # Import staticCon f
 import userCon;
 import articleCon;
 import categoryCon;
+import externKbCon;
 
 # xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx

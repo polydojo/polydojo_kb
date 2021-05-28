@@ -44,6 +44,8 @@ def post_categoryCon_editCategory ():
     oldCategory = categoryMod.getCategory(jdata.categoryId);    # old => before update
     assert oldCategory and oldCategory._id;
     assert auth.validateCategoryEditable(oldCategory, sesh.user);
+    # TODO: Disallow mutually-infinitely-recursive category parents.
+    # Eg.   catA.parent -> catB;  &  catB.parent -> catA;
     if jdata.parentId and jdata.parentId != oldCategory.parentId:
         assert jdata.categoryId != jdata.parentId;
         newKaParent = categoryMod.getCategory(jdata.parentId);

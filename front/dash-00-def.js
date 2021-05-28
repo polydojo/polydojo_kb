@@ -28,12 +28,8 @@ var app = {
 app.o.userMap = uk.observableDocMap("fname");
 app.o.articleMap = uk.observableDocMap("title");
 app.o.categoryMap = uk.observableDocMap("rank");
-app.o.categoryMap.updateOne({
-    "_id": "",
-    "name": "",
-    "rank": 0,
-    "parentId": null, // special null, not "", to avoid inf-recursion
-});
+app.o.categoryMap.updateOne(K.TOP_BLANK_CATEGORY);          // Top category w/ ._id="" (and .parentId=null to avoid inf-recursion).
+
 
 app.o.currentUserId = uk.observable(null);
 app.c.currentUser = uk.computed(

@@ -16,7 +16,13 @@ var K = {
         "author",
         "editor",
         "admin"
-    ]
+    ],
+    "TOP_BLANK_CATEGORY": {
+        "_id": "",
+        "name": "",
+        "rank": 0,
+        "parentId": null
+    }
 };
 
 module.exports = K;

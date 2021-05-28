@@ -131,6 +131,18 @@
                         >
                             {{ article.title }}
                         </a>
+                        <span class="" style="color: mediumSlateBlue" title="{{article.status.toUpperCase().split('_').join(' ')}}">
+                            <!-- TODO: Alert title attr on click. -->
+                            <% if (article.status === "draft") { %>
+                                <i class="fa fa-fw fa-drafting-compass"></i>
+                            <% } else if (article.status === "published_internally") { %>
+                                <i class="fa fa-fw fa-building"></i>
+                            <% } else if (article.status === "published_externally") { %>
+                                <i class="fa fa-fw fa-globe-americas"></i>
+                            <% } else { %>
+                                [[Error: Unexpected status.]]
+                            <% } %>
+                        </span>
                     </div>
                 <% }); %>
                 <p></p>
@@ -197,7 +209,7 @@
                         </button>
                         <div class="dropdown-menu dropdown-menu-right">
                             <a class="dropdown-item cursorPointer" data-on="click" data-call="/articleLister/onClick_createCategory">
-                                <i class="fa fa-fw fa-folder-plus"></i> New Category
+                                <i class="fa fa-fw fa-sitemap"></i> New Category
                             </a>
                         </div>
                     </div>

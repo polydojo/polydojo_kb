@@ -1,0 +1,82 @@
+@# Params: category, subcategoryList, articleList,
+
+<python>
+subcategoryList.sort(key=lambda c: c.rank);
+articleList.sort(key=lambda a: a.title);    #<!--TODO: a.rank-->
+</python>
+
+<!doctype html>
+<html>
+<head>
+    <!-- TODO:Feature:: Allow custom favicon and title/etc. tag. -->
+    <link rel="shortcut icon" href="/front/img/logo/logo-192.png">
+    <link rel="apple-touch-icon" href="/front/img/logo/logo-192.png">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">    
+    
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/node_modules/@fortawesome/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="/node_modules/summernote/dist/summernote-bs4.css"><!-- pre-minified -->
+    <link rel="stylesheet" href="/front/helpers.css">
+    <link rel="stylesheet" href="/front/general.css">
+    <link rel="stylesheet" href="/front/dash.css">
+    
+    <title>Polydojo KB</title>
+</head>
+<body class="container">
+    <header>
+        <p><a href="/">KB Home</a></p>
+        <h4>Search</h4>
+        <form onsubmit="alert('Search functionality has not been implemented, yet.'); return false;">
+            <div class="form-group">
+                <input type="search" name="qtext" placeholder="Search ..." class="form-control form-control-lg">
+            </div>
+        </form>
+        <hr>
+    </header>
+    
+    
+    <div class="main">
+        <h2>{{py: category.name or "Knowledge Base"}}</h2>
+        <p></p>
+        
+        
+        @ if len(articleList):
+            <h4>Articles:</h4>
+        @ else:
+            <p class="gray">There are no articles in this category.</p>
+        @ end
+        <ul class="large">
+            @ for article in articleList:
+                <li>
+                    <a href="/article/{{py: article._id}}">
+                        {{py: article.title}}
+                    </a>
+                </li>
+            @ end
+        </ul>
+
+
+        @ if len(subcategoryList):
+            <h4>{{py: 'Subcategories:' if category._id != '' else 'Categories:'}}</h4>
+        @ end
+        <ul class="large">
+            @ for subcategory in subcategoryList:
+                <li>
+                    <a href="/category/{{py: subcategory._id}}">
+                        {{py: subcategory.name}}
+                    </a>
+                </li>
+            @ end
+        </ul>
+    </div>
+    
+
+    <footer class="small gray">
+        <br><br><hr class="mb-2">
+        Powered by <!-- TODO: Set .ghRepoUrl's href via js. -->
+        <a class="unsetColor underline ghRepoUrl" href="https://github.com/polydojo/polydojo_kb" target="_blank">Polydojo KB</a>.
+    </footer>
+    
+</body>
+</html>
